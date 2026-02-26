@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.post("/", verifyToken, upload.array("images", 5), createListing);
 router.get("/", getAllListings);
-router.get("/user", verifyToken, getUserListing);
+router.get("/user-listing", verifyToken, getUserListing);
 router.get("/:id", getListingById);
 
 export default router;
