@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import apiRequest from "../utils/apiRequest";
 import useAuthStore from "../utils/authStore";
 
@@ -151,6 +151,7 @@ const ListingPage = () => {
           )}
           {isOwner && (
             <div className="flex gap-2 mt-6">
+              <Link to={`/update-listing/${listing._id}`}>
               <button
                 className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-all duration-200 border border-blue-200"
                 title="Edit listing"
@@ -170,6 +171,7 @@ const ListingPage = () => {
                 </svg>
                 <span className="font-medium">Edit</span>
               </button>
+              </Link>
               <button
                 onClick={handleDeleteListing}
                 className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-all duration-200 border border-red-200"

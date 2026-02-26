@@ -187,3 +187,66 @@ export const userDeleteListing = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const updateListing = async (req: Request, res: Response) => {
+  const { listingId } = req.params;
+  const ownerId = (req as any).user._id;
+  const { title, description, price, category, location } = req.body;
+
+  try {
+    const listing = await listingModel.findById(listingId);
+
+    if (!listing) {
+      return res.status(404).json({
+        success: false,
+        message: "Listing not found",
+      });
+    }
+
+    if (listing.owner.toString() !== ownerId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to update this listing",
+      });
+    }
+
+    const images = req.files as Express.Multer.File[];
+
+    let imageUrls: string[] = [];
+
+    if (images && images.length > 0) {
+      const uploadPromises = images.map((file) => uploadOnCloudinary(file.path));
+      const uploadResults = await Promise.all(uploadPromises);
+      imageUrls = uploadResults
+        .filter((result) => result !== null)
+        .map((result) => result!.url);
+    } else {
+      imageUrls = listing.images;
+    }
+
+    const updatedListing = await listingModel.findByIdAndUpdate(
+      listingId,
+      {
+        title,
+        description,
+        price,
+        category,
+        location,
+        images: imageUrls,
+      },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Listing updated successfully",
+      data: updatedListing,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update listing",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};

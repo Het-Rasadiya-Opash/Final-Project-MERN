@@ -5,6 +5,7 @@ import ListingPage from "./pages/ListingPage";
 import AuthPage from "./pages/AuthPage";
 import CreateListing from "./pages/CreateListing";
 import Profile from "./pages/Profile";
+import EditListing from "./pages/EditListing";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/listing/:id" element={<ListingPage />} />
         <Route path="/create-listing" element={<CreateListing />} />
+        <Route path="/update-listing/:listingId" element={<EditListing/>} />
       </Routes>
     </>
   );

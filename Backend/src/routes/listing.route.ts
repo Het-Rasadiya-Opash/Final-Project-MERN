@@ -4,6 +4,7 @@ import {
   getAllListings,
   getListingById,
   getUserListing,
+  updateListing,
   userDeleteListing,
 } from "../controllers/listing.controller.js";
 import { verifyToken } from "../middlewares/verfiyToken.js";
@@ -16,5 +17,11 @@ router.get("/", getAllListings);
 router.get("/user-listing", verifyToken, getUserListing);
 router.get("/:id", getListingById);
 router.delete("/:listingId", verifyToken, userDeleteListing);
+router.put(
+  "/:listingId",
+  verifyToken,
+  upload.array("images", 5),
+  updateListing,
+);
 
 export default router;
