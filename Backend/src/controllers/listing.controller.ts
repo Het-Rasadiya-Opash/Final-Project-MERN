@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { listingModel } from "../models/listing.model.js";
-import { uploadOnCloudinary } from "../config/cloudinary.js";
+import { uploadOnCloudinary, deleteFromCloudinary } from "../config/cloudinary.js";
 
 export const createListing = async (req: Request, res: Response) => {
   const { title, description, price, category, location } = req.body;
@@ -143,6 +143,43 @@ export const getUserListing = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Failed to fetch listings",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
+export const userDeleteListing = async (req: Request, res: Response) => {
+  const { listingId } = req.params;
+  const ownerId = (req as any).user._id;
+  try {
+    const listing = await listingModel.findById(listingId);
+
+    if (!listing) {
+      return res.status(404).json({
+        success: false,
+        message: "Listing not found",
+      });
+    }
+
+    if (listing.owner.toString() !== ownerId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this listing",
+      });
+    }
+
+    await Promise.all(listing.images.map((url) => deleteFromCloudinary(url)));
+
+    await listingModel.findByIdAndDelete(listingId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Listing deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete listing",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

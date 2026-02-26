@@ -39,4 +39,27 @@ const uploadOnCloudinary = async (localFilePath: string) => {
   }
 };
 
-export { uploadOnCloudinary };
+const deleteFromCloudinary = async (cloudinaryUrl: string) => {
+  try {
+    configureCloudinary();
+    if (!cloudinaryUrl) return null;
+
+    const urlParts = cloudinaryUrl.split("/");
+    const uploadIndex = urlParts.indexOf("upload");
+    const pathAfterUpload = urlParts.slice(uploadIndex + 2).join("/");
+    const publicId = pathAfterUpload.split(".")[0];
+
+    if (!publicId) {
+      console.error("Could not extract public_id from URL:", cloudinaryUrl);
+      return null;
+    }
+
+    const response = await cloudinary.uploader.destroy(publicId);
+    return response;
+  } catch (error: any) {
+    console.error("Cloudinary delete error:", error.message);
+    return null;
+  }
+};
+
+export { uploadOnCloudinary, deleteFromCloudinary };
