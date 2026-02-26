@@ -210,18 +210,19 @@ export const updateListing = async (req: Request, res: Response) => {
       });
     }
 
-    const images = req.files as Express.Multer.File[];
+    const files = req.files as Express.Multer.File[];
 
-    let imageUrls: string[] = [];
+    let imageUrls: string[] = listing.images || [];
 
-    if (images && images.length > 0) {
-      const uploadPromises = images.map((file) => uploadOnCloudinary(file.path));
+    if (files && files.length > 0) {
+      const uploadPromises = files.map((file) => uploadOnCloudinary(file.path));
       const uploadResults = await Promise.all(uploadPromises);
-      imageUrls = uploadResults
+
+      const newImageUrls = uploadResults
         .filter((result) => result !== null)
         .map((result) => result!.url);
-    } else {
-      imageUrls = listing.images;
+
+      imageUrls = [...imageUrls, ...newImageUrls];
     }
 
     const updatedListing = await listingModel.findByIdAndUpdate(
@@ -234,7 +235,7 @@ export const updateListing = async (req: Request, res: Response) => {
         location,
         images: imageUrls,
       },
-      { new: true }
+      { new: true },
     );
 
     return res.status(200).json({
