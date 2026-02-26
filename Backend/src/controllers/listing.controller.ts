@@ -99,11 +99,12 @@ export const getAllListings = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getListingById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const listing = await listingModel.findById(id).populate("owner", "username email");
+    const listing = await listingModel
+      .findById(id)
+      .populate("owner", "username email");
     if (!listing) {
       return res.status(404).json({
         success: false,
@@ -121,4 +122,28 @@ export const getListingById = async (req: Request, res: Response) => {
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
-}
+};
+
+export const getUserListing = async (req: Request, res: Response) => {
+  try {
+    const listings = await listingModel
+      .find({ owner: (req as any).user._id })
+      .populate("owner", "username email");
+    if (!listings) {
+      return res.status(404).json({
+        success: false,
+        message: "Listings not found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      data: listings,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch listings",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
