@@ -1,6 +1,9 @@
 import type { Request, Response } from "express";
 import { listingModel } from "../models/listing.model.js";
-import { uploadOnCloudinary, deleteFromCloudinary } from "../config/cloudinary.js";
+import {
+  uploadOnCloudinary,
+  deleteFromCloudinary,
+} from "../config/cloudinary.js";
 
 export const createListing = async (req: Request, res: Response) => {
   const { title, description, price, category, location } = req.body;

@@ -46,6 +46,7 @@ const HomePage = () => {
     }
   };
 
+
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
@@ -93,6 +94,11 @@ const HomePage = () => {
           <div className="text-center py-8">Loading...</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            {listings.length === 0 && (
+              <div className="col-span-full text-center py-8">
+                No listings found.
+              </div>
+            )}
             {listings.map((listing: any) => (
               <Listing key={listing._id} listing={listing} />
             ))}
