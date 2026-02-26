@@ -28,7 +28,6 @@ const EditListing = () => {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   useEffect(() => {
-    
     const fetchListing = async () => {
       try {
         const response = await apiRequest.get(`/listing/${listingId}`);
