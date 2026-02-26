@@ -5,6 +5,7 @@ interface User {
   _id: string;
   username: string;
   email: string;
+  createdAt: string;
 }
 
 interface AuthStore {
@@ -20,8 +21,8 @@ const useAuthStore = create<AuthStore>()(
       setCurrentUser: (newUser) => set({ currentUser: newUser }),
       removeCurrentUser: () => set({ currentUser: null }),
     }),
-    { name: "auth-storage" }
-  )
+    { name: "auth-storage" },
+  ),
 );
 
 export default useAuthStore;
