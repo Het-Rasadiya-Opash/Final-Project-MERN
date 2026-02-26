@@ -49,7 +49,8 @@ export const logoutUser = async (req: Request, res: Response) => {
 };
 
 export const getUserProfile = async (req: Request, res: Response) => {
-  const { userId } = (req as any).user;
+  const userId = (req as any).user;
+  console.log(userId);
   const user = await userModel.findById(userId);
   res.status(200).json({ user });
 };
