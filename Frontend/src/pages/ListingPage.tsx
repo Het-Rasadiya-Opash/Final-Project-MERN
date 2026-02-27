@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import apiRequest from "../utils/apiRequest";
 import useAuthStore from "../utils/authStore";
 import ReviewForm from "../components/ReviewForm";
+import Review from "../components/Review";
 
 const ListingPage = () => {
   const { id } = useParams();
@@ -153,25 +154,25 @@ const ListingPage = () => {
           {isOwner && (
             <div className="flex gap-2 mt-6">
               <Link to={`/update-listing/${listing._id}`}>
-              <button
-                className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-all duration-200 border border-blue-200"
-                title="Edit listing"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                <button
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-all duration-200 border border-blue-200"
+                  title="Edit listing"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-                <span className="font-medium">Edit</span>
-              </button>
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                  <span className="font-medium">Edit</span>
+                </button>
               </Link>
               <button
                 onClick={handleDeleteListing}
@@ -197,10 +198,15 @@ const ListingPage = () => {
           )}
         </div>
       </div>
-      
+
       <div className="mt-8 border-t pt-8">
         <h2 className="text-2xl font-bold mb-6">Leave a Review</h2>
         <ReviewForm listingId={id} />
+      </div>
+
+      <div className="mt-8 border-t pt-8">
+        <h2 className="text-2xl font-bold mb-6">All Review</h2>
+        <Review listingId={id} />
       </div>
     </div>
   );
