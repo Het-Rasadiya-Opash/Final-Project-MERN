@@ -27,7 +27,7 @@ export const createReview = async (req: Request, res: Response) => {
         $push: { reviews: review._id },
       },
       {
-        new: true,
+        returnDocument: "after",
       },
     );
 
