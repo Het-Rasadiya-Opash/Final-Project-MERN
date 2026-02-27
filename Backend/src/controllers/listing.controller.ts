@@ -5,7 +5,8 @@ import {
   deleteFromCloudinary,
 } from "../config/cloudinary.js";
 import { v2 as cloudinary } from "cloudinary";
-import { Parser } from "json2csv";
+import { json2csv } from "json-2-csv";
+
 
 export const createListing = async (req: Request, res: Response) => {
   const { title, description, price, category, location } = req.body;
@@ -295,12 +296,13 @@ export const deleteListingImage = async (req: Request, res: Response) => {
   }
 };
 
+
 export const getUserListingCSVData = async (req: Request, res: Response) => {
   try {
     const listings = await listingModel
       .find({ owner: (req as any).user._id })
       .populate("owner", "username email")
-      .lean(); // js to json convert
+      .lean();
 
     if (!listings || listings.length === 0) {
       return res
@@ -308,20 +310,20 @@ export const getUserListingCSVData = async (req: Request, res: Response) => {
         .json({ success: false, message: "No listings to export" });
     }
 
-    const fields = [
-      "title",
-      "price",
-      "location",
-      "owner.username",
-      "owner.email",
-      "createdAt",
-    ];
-    const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(listings);
+    const csv = json2csv(listings, {
+      keys: [
+        "title",
+        "price",
+        "location",
+        "owner.username",
+        "owner.email",
+        "createdAt",
+      ],
+    });
 
     res.setHeader("Content-Type", "text/csv");
     res.setHeader("Content-Disposition", "attachment; filename=listings.csv");
-
+    
     return res.status(200).send(csv);
   } catch (error) {
     return res.status(500).json({
