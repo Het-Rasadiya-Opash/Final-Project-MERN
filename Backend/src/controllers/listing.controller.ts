@@ -329,3 +329,26 @@ export const getUserListingCSVData = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getReviewofListing = async (req: Request, res: Response) => {
+  const { listingId } = req.params;
+  try {
+    const listing = await listingModel.findById(listingId).populate({
+      path: "reviews",
+      populate: {
+        path: "owner",
+        select: "username",
+      },
+    });
+    return res.status(200).json({
+      success: true,
+      data: listing?.reviews,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch reviews",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
