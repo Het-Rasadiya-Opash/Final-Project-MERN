@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import apiRequest from "../utils/apiRequest";
+import useAuthStore from "../utils/authStore";
 
 interface ReviewProps {
   listingId?: string;
@@ -12,12 +13,15 @@ interface ReviewData {
   rating: number;
   owner: {
     username: string;
+    _id: string;
   };
   createdAt: string;
 }
 
 const Review = ({ listingId, refreshTrigger }: ReviewProps) => {
   const [reviews, setReviews] = useState<ReviewData[]>([]);
+  const { currentUser } = useAuthStore();
+  console.log(currentUser?._id);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -86,12 +90,14 @@ const Review = ({ listingId, refreshTrigger }: ReviewProps) => {
                 </span>
               </div>
               <p className="text-gray-700 leading-relaxed">{review.comment}</p>
-              <button
-                onClick={() => handleDeleteReview(review._id)}
-                className="mt-3 text-sm text-red-600 hover:text-red-700 font-medium"
-              >
-                Delete
-              </button>
+              {currentUser?._id === review.owner._id && (
+                <button
+                  onClick={() => handleDeleteReview(review._id)}
+                  className="mt-3 text-sm text-red-600 hover:text-red-700 font-medium"
+                >
+                  Delete
+                </button>
+              )}
             </div>
           ))}
         </div>
