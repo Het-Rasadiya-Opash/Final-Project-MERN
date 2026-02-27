@@ -3,9 +3,10 @@ import apiRequest from "../utils/apiRequest";
 
 interface ReviewFormProps {
   listingId?: string;
+  onReviewAdded?: () => void;
 }
 
-const ReviewForm = ({ listingId }: ReviewFormProps) => {
+const ReviewForm = ({ listingId, onReviewAdded }: ReviewFormProps) => {
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     comment: "",
@@ -22,18 +23,19 @@ const ReviewForm = ({ listingId }: ReviewFormProps) => {
     e.preventDefault();
     setError("");
     try {
-      const res = await apiRequest.post(
+       await apiRequest.post(
         `/review/create/${listingId}`,
         formData,
-      );
+      )
       setFormData({ comment: "", rating: "" });
+      onReviewAdded?.();
     } catch (err: any) {
       setError(err.response?.data?.message);
     }
   };
 
   return (
-    <div className="bg-gray-50 rounded-lg p-6">
+    <div className="bg-transparent">
       {error && (
         <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
           {error}
@@ -80,6 +82,7 @@ const ReviewForm = ({ listingId }: ReviewFormProps) => {
         </div>
         <button
           type="submit"
+
           className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 font-semibold"
         >
           Submit Review

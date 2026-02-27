@@ -3,6 +3,7 @@ import apiRequest from "../utils/apiRequest";
 
 interface ReviewProps {
   listingId?: string;
+  refreshTrigger?: number;
 }
 
 interface ReviewData {
@@ -15,7 +16,7 @@ interface ReviewData {
   createdAt: string;
 }
 
-const Review = ({ listingId }: ReviewProps) => {
+const Review = ({ listingId, refreshTrigger }: ReviewProps) => {
   const [reviews, setReviews] = useState<ReviewData[]>([]);
 
   useEffect(() => {
@@ -23,46 +24,46 @@ const Review = ({ listingId }: ReviewProps) => {
       try {
         const response = await apiRequest.get(`/listing/review/${listingId}`);
         setReviews(response.data.data);
-        console.log(response.data.data);
       } catch (error) {
         console.error("Error fetching reviews:", error);
       }
     };
     fetchReviews();
-  }, []);
+  }, [listingId, refreshTrigger]);
 
   return (
-    <div className="mt-8">
-      <h2 className="text-2xl font-bold mb-6">Reviews</h2>
+    <div className="space-y-4">
       {reviews.length === 0 ? (
-        <p className="text-gray-500">No reviews yet</p>
+        <p className="text-gray-500 text-center py-4">No reviews yet</p>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 max-h-125 overflow-y-auto pr-2" style={{scrollbarWidth: 'thin', scrollbarColor: '#cbd5e0 #f7fafc'}}>
           {reviews.map((review) => (
-            <div key={review._id} className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">{review.owner.username}</span>
-                  <div className="flex">
-                    {[...Array(5)].map((_, i) => (
-                      <span
-                        key={i}
-                        className={
-                          i < review.rating
-                            ? "text-yellow-400"
-                            : "text-gray-300"
-                        }
-                      >
-                        ★
-                      </span>
-                    ))}
+            <div key={review._id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                    {review.owner.username.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-800">{review.owner.username}</p>
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className={`text-lg ${i < review.rating ? "text-yellow-400" : "text-gray-300"}`}>
+                          ★
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <span className="text-sm text-gray-500">
-                  {new Date(review.createdAt).toLocaleDateString()}
+                <span className="text-xs text-gray-500">
+                  {new Date(review.createdAt).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
                 </span>
               </div>
-              <p className="text-gray-700">{review.comment}</p>
+              <p className="text-gray-700 leading-relaxed">{review.comment}</p>
             </div>
           ))}
         </div>
