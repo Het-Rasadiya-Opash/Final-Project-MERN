@@ -98,13 +98,15 @@ const Profile = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={handleExportCSV}
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-300 hover:text-blue-600 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                className="group flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-300 hover:text-blue-600 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-100"
               >
                 <Download
                   size={18}
-                  className="text-gray-400 group-hover:text-blue-600"
+                  className="text-gray-400 group-hover:text-blue-600 transition-colors"
                 />
-                <span>Export CSV</span>
+                <span className="group-hover:text-blue-600 transition-colors">
+                  Export CSV
+                </span>
               </button>
             </div>
           </div>
