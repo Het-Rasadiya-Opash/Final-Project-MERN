@@ -46,7 +46,6 @@ export const createReview = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getReviewofListing = async (req: Request, res: Response) => {
   const { listingId } = req.params;
   try {
@@ -70,3 +69,31 @@ export const getReviewofListing = async (req: Request, res: Response) => {
   }
 };
 
+export const deleteReviewofListing = async (req: Request, res: Response) => {
+  const { listingId } = req.params;
+  const { reviewId } = req.body;
+  try {
+    const listing = await listingModel.findById(listingId);
+    if (!listing || !listing.reviews) {
+      return res.status(404).json({
+        success: false,
+        message: "Listing not found",
+      });
+    }
+    listing.reviews = listing.reviews.filter(
+      (review) => review.toString() !== reviewId,
+    );
+    await listing.save();
+    await reviewModel.findByIdAndDelete(reviewId);
+    return res.status(200).json({
+      success: true,
+      message: "Review deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete review",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
