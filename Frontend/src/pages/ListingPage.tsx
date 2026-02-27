@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import apiRequest from "../utils/apiRequest";
 import useAuthStore from "../utils/authStore";
+import ReviewForm from "../components/ReviewForm";
 
 const ListingPage = () => {
   const { id } = useParams();
@@ -195,6 +196,11 @@ const ListingPage = () => {
             </div>
           )}
         </div>
+      </div>
+      
+      <div className="mt-8 border-t pt-8">
+        <h2 className="text-2xl font-bold mb-6">Leave a Review</h2>
+        <ReviewForm listingId={id} />
       </div>
     </div>
   );
