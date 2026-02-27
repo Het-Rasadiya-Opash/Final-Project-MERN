@@ -4,7 +4,6 @@ import {
   deleteListingImage,
   getAllListings,
   getListingById,
-  getReviewofListing,
   getUserListing,
   getUserListingCSVData,
   updateListing,
@@ -19,7 +18,6 @@ router.post("/", verifyToken, upload.array("images", 5), createListing);
 router.get("/", getAllListings);
 router.get("/user-listing", verifyToken, getUserListing);
 router.get("/csv-data", verifyToken, getUserListingCSVData);
-router.get("/review/:listingId", getReviewofListing);
 
 router.get("/:id", getListingById);
 router.delete("/:listingId", verifyToken, userDeleteListing);

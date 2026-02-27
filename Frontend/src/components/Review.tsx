@@ -22,7 +22,7 @@ const Review = ({ listingId, refreshTrigger }: ReviewProps) => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await apiRequest.get(`/listing/review/${listingId}`);
+        const response = await apiRequest.get(`/review/${listingId}`);
         setReviews(response.data.data);
       } catch (error) {
         console.error("Error fetching reviews:", error);
