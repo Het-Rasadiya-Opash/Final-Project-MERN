@@ -46,3 +46,23 @@ export const createReview = async (req: Request, res: Response) => {
   }
 };
 
+export const getReviewofListing = async (req: Request, res: Response) => {
+  const { listingId } = req.params;
+  try {
+    const listing = await listingModel.findById(listingId).populate("reviews");
+    const review = await reviewModel
+      .findById(listing?.reviews?.[0])
+      .populate("owner", "username");
+    return res.status(200).json({
+      success: true,
+      listing,
+      review,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
