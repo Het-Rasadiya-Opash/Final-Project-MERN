@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import useAuthStore from "../utils/authStore";
 import apiRequest from "../utils/apiRequest";
 import Listing from "../components/Listing";
-import { User, Mail, Calendar, Package } from "lucide-react";
+import { User, Mail, Calendar, Package, Download } from "lucide-react";
 
 const Profile = () => {
   const { currentUser } = useAuthStore();
@@ -15,7 +15,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserListing = async () => {
       try {
-        const res = await apiRequest.get(`listing/user-listing`);
+        const res = await apiRequest.get(`/listing/user-listing`);
         setListings(res.data.data);
       } catch (error) {
         console.error("Failed to fetch listing:", error);
@@ -25,6 +25,25 @@ const Profile = () => {
     };
     fetchUserListing();
   }, []);
+
+  const handleExportCSV = async () => {
+    try {
+      const response = await apiRequest.get(`/listing/csv-data`, {
+        responseType: "blob",
+      });
+      const blob = new Blob([response.data], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "data.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading the CSV file:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 py-8 px-4">
@@ -37,27 +56,57 @@ const Profile = () => {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <User size={18} className="text-gray-600" />
-                <span className="text-lg font-semibold text-gray-800">{currentUser.username}</span>
+                <span className="text-lg font-semibold text-gray-800">
+                  {currentUser.username}
+                </span>
               </div>
               <div className="flex items-center gap-2 mb-2">
                 <Mail size={18} className="text-gray-600" />
-                <span className="text-sm text-gray-600">{currentUser.email}</span>
+                <span className="text-sm text-gray-600">
+                  {currentUser.email}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <Calendar size={18} className="text-gray-600" />
-                <span className="text-sm text-gray-500">Member since {new Date(currentUser.createdAt).toLocaleDateString()}</span>
+                <span className="text-sm text-gray-500">
+                  Member since{" "}
+                  {new Date(currentUser.createdAt).toLocaleDateString()}
+                </span>
               </div>
             </div>
           </div>
         </div>
 
         <div className="bg-white shadow-lg rounded-2xl p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="bg-blue-100 p-2 rounded-lg">
-              <Package size={24} className="text-blue-600" />
+          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
+            <div className="flex items-center gap-4">
+              <div className="bg-blue-50 p-2.5 rounded-xl shadow-sm border border-blue-100">
+                <Package size={22} className="text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 leading-tight">
+                  Your Listings
+                </h2>
+                {!loading && (
+                  <p className="text-sm text-gray-500 font-medium">
+                    Total : {listings.length} Lisitng
+                  </p>
+                )}
+              </div>
             </div>
-            <h2 className="text-xl font-bold text-gray-800">Your Listings</h2>
-            {!loading && <span className="ml-auto bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">{listings.length}</span>}
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleExportCSV}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-300 hover:text-blue-600 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              >
+                <Download
+                  size={18}
+                  className="text-gray-400 group-hover:text-blue-600"
+                />
+                <span>Export CSV</span>
+              </button>
+            </div>
           </div>
 
           {loading ? (
@@ -68,7 +117,9 @@ const Profile = () => {
             <div className="text-center py-12">
               <Package size={48} className="mx-auto text-gray-300 mb-3" />
               <p className="text-gray-500">No listings yet</p>
-              <p className="text-gray-400 text-sm mt-1">Start creating your first listing!</p>
+              <p className="text-gray-400 text-sm mt-1">
+                Start creating your first listing!
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

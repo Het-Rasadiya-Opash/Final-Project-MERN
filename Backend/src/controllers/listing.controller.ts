@@ -309,7 +309,6 @@ export const getUserListingCSVData = async (req: Request, res: Response) => {
     }
 
     const fields = [
-      "_id",
       "title",
       "price",
       "location",
