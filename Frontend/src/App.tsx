@@ -6,6 +6,7 @@ import AuthPage from "./pages/AuthPage";
 import CreateListing from "./pages/CreateListing";
 import Profile from "./pages/Profile";
 import EditListing from "./pages/EditListing";
+import ProtectedRoutes from "./components/ProtectedRoutes";
 
 const App = () => {
   return (
@@ -14,10 +15,13 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
-        <Route path="/profile" element={<Profile />} />
+
         <Route path="/listing/:id" element={<ListingPage />} />
-        <Route path="/create-listing" element={<CreateListing />} />
-        <Route path="/update-listing/:listingId" element={<EditListing/>} />
+        <Route element={<ProtectedRoutes />}>
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/create-listing" element={<CreateListing />} />
+          <Route path="/update-listing/:listingId" element={<EditListing />} />
+        </Route>
       </Routes>
     </>
   );
