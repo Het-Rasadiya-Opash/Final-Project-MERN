@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createListing,
+  deleteListingImage,
   getAllListings,
   getListingById,
   getUserListing,
@@ -23,5 +24,7 @@ router.put(
   upload.array("images", 5),
   updateListing,
 );
+
+router.delete("/:id/image", deleteListingImage);
 
 export default router;

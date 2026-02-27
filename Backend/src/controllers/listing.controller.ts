@@ -4,6 +4,7 @@ import {
   uploadOnCloudinary,
   deleteFromCloudinary,
 } from "../config/cloudinary.js";
+import { v2 as cloudinary } from "cloudinary";
 
 export const createListing = async (req: Request, res: Response) => {
   const { title, description, price, category, location } = req.body;
@@ -238,6 +239,13 @@ export const updateListing = async (req: Request, res: Response) => {
       { new: true },
     );
 
+    if (!imageUrls || imageUrls.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one image is required",
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: "Listing updated successfully",
@@ -248,6 +256,46 @@ export const updateListing = async (req: Request, res: Response) => {
       success: false,
       message: "Failed to update listing",
       error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
+
+
+export const deleteListingImage = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { imageUrl } = req.body;
+
+  try {
+    const listing = await listingModel.findById(id);
+
+    if (!listing) {
+      return res.status(404).json({ message: "Listing not found" });
+    }
+
+    if (listing.images.length <= 1) {
+      return res.status(400).json({
+        message: "At least one image is required",
+      });
+    }
+
+    const publicId = imageUrl
+      .split("/")
+      .slice(-2) 
+      .join("/")
+      .split(".")[0];
+
+    await cloudinary.uploader.destroy(publicId);
+
+    listing.images = listing.images.filter((img) => img !== imageUrl);
+    await listing.save();
+
+    return res.status(200).json({
+      message: "Image deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to delete image",
     });
   }
 };

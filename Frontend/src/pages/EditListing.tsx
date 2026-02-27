@@ -80,6 +80,26 @@ const EditListing = () => {
     setImagePreviews(filePreviews);
   };
 
+  const handleDeleteImage = async (imageUrl: string) => {
+    try {
+      await apiRequest.delete(`/listing/${listingId}/image`, {
+        data: { imageUrl },
+      });
+
+      setExistingImages((prev) => prev.filter((img) => img !== imageUrl));
+    } catch (err:any) {
+      setError(err.response?.data?.message);
+    }
+  };
+
+  const handleRemoveNewImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => {
+      URL.revokeObjectURL(prev[index]);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
   return (
     <div className="max-w-2xl mx-auto p-4 sm:p-6">
       <h1 className="text-2xl sm:text-3xl font-bold mb-6">Edit Listing</h1>
@@ -91,35 +111,55 @@ const EditListing = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {existingImages.length > 0 && (
+        {existingImages.length > 0 || imagePreviews.length > 0 ? (
           <div className="mb-6">
             <label className="block text-gray-700 mb-2 font-medium">
-              Current Images
+              Images Preview
             </label>
+
             <div className="flex gap-2 flex-wrap">
               {existingImages.map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  alt="preview"
-                  className="w-24 h-24 object-cover rounded-lg border"
-                />
-              ))}
-              {imagePreviews.map((img, idx) => (
-                <div key={`new-${idx}`} className="relative">
+                <div key={`existing-${index}`} className="relative">
                   <img
                     src={img}
-                    alt="New"
-                    className="w-full h-24 object-cover rounded-lg border-2 border-blue-500"
+                    alt="preview"
+                    className="w-24 h-24 object-cover rounded-lg border"
                   />
+
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteImage(img)}
+                    className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full hover:bg-red-700"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+
+              {imagePreviews.map((preview, index) => (
+                <div key={`new-${index}`} className="relative">
+                  <img
+                    src={preview}
+                    alt="new-preview"
+                    className="w-24 h-24 object-cover rounded-lg border-2 border-blue-500"
+                  />
+
                   <span className="absolute top-1 left-1 bg-blue-600 text-white text-[10px] px-1 rounded">
                     New
                   </span>
+
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveNewImage(index)}
+                    className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full hover:bg-red-700"
+                  >
+                    ✕
+                  </button>
                 </div>
               ))}
             </div>
           </div>
-        )}
+        ) : null}
         <div>
           <label className="block text-gray-700 mb-2 font-medium">
             Images (optional)
