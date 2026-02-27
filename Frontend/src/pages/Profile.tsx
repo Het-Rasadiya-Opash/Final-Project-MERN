@@ -78,35 +78,37 @@ const Profile = () => {
         </div>
 
         <div className="bg-white shadow-lg rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
-            <div className="flex items-center gap-4">
-              <div className="bg-blue-50 p-2.5 rounded-xl shadow-sm border border-blue-100">
-                <Package size={22} className="text-blue-600" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-4 border-b border-gray-100 gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="bg-blue-50 p-2 sm:p-2.5 rounded-xl shadow-sm border border-blue-100 shrink-0">
+                <Package
+                  size={20}
+                  className="text-blue-600 sm:w-5.5 sm:h-5.5"
+                />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900 leading-tight">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">
                   Your Listings
                 </h2>
                 {!loading && (
-                  <p className="text-sm text-gray-500 font-medium">
-                    Total : {listings.length} Lisitng
+                  <p className="text-xs sm:text-sm text-gray-500 font-medium">
+                    Total: {listings.length}{" "}
+                    {listings.length === 1 ? "Listing" : "Listings"}
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center w-full sm:w-auto">
               <button
                 onClick={handleExportCSV}
-                className="group flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-300 hover:text-blue-600 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                className="group flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-300 hover:text-blue-600 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-100"
               >
                 <Download
                   size={18}
                   className="text-gray-400 group-hover:text-blue-600 transition-colors"
                 />
-                <span className="group-hover:text-blue-600 transition-colors">
-                  Export CSV
-                </span>
+                <span className="transition-colors">Export CSV</span>
               </button>
             </div>
           </div>
