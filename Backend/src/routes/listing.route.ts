@@ -5,6 +5,7 @@ import {
   getAllListings,
   getListingById,
   getUserListing,
+  getUserListingCSVData,
   updateListing,
   userDeleteListing,
 } from "../controllers/listing.controller.js";
@@ -16,6 +17,8 @@ const router = express.Router();
 router.post("/", verifyToken, upload.array("images", 5), createListing);
 router.get("/", getAllListings);
 router.get("/user-listing", verifyToken, getUserListing);
+router.get("/csv-data", verifyToken, getUserListingCSVData);
+
 router.get("/:id", getListingById);
 router.delete("/:listingId", verifyToken, userDeleteListing);
 router.put(
@@ -24,7 +27,6 @@ router.put(
   upload.array("images", 5),
   updateListing,
 );
-
 router.delete("/:id/image", deleteListingImage);
 
 export default router;

@@ -5,6 +5,7 @@ import {
   deleteFromCloudinary,
 } from "../config/cloudinary.js";
 import { v2 as cloudinary } from "cloudinary";
+import { Parser } from "json2csv";
 
 export const createListing = async (req: Request, res: Response) => {
   const { title, description, price, category, location } = req.body;
@@ -260,8 +261,6 @@ export const updateListing = async (req: Request, res: Response) => {
   }
 };
 
-
-
 export const deleteListingImage = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { imageUrl } = req.body;
@@ -279,11 +278,7 @@ export const deleteListingImage = async (req: Request, res: Response) => {
       });
     }
 
-    const publicId = imageUrl
-      .split("/")
-      .slice(-2) 
-      .join("/")
-      .split(".")[0];
+    const publicId = imageUrl.split("/").slice(-2).join("/").split(".")[0];
 
     await cloudinary.uploader.destroy(publicId);
 
@@ -296,6 +291,44 @@ export const deleteListingImage = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).json({
       message: "Failed to delete image",
+    });
+  }
+};
+
+export const getUserListingCSVData = async (req: Request, res: Response) => {
+  try {
+    const listings = await listingModel
+      .find({ owner: (req as any).user._id })
+      .populate("owner", "username email")
+      .lean(); // js to json convert
+
+    if (!listings || listings.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No listings to export" });
+    }
+
+    const fields = [
+      "_id",
+      "title",
+      "price",
+      "location",
+      "owner.username",
+      "owner.email",
+      "createdAt",
+    ];
+    const json2csvParser = new Parser({ fields });
+    const csv = json2csvParser.parse(listings);
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", "attachment; filename=listings.csv");
+
+    return res.status(200).send(csv);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to export CSV",
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
