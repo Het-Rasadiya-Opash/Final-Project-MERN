@@ -70,7 +70,7 @@ const Profile = () => {
                 <Calendar size={18} className="text-gray-600" />
                 <span className="text-sm text-gray-500">
                   Member since{" "}
-                  {new Date(currentUser.createdAt).toLocaleDateString()}
+                  {new Date(currentUser.createdAt).toLocaleDateString("en-GB")}
                 </span>
               </div>
             </div>
