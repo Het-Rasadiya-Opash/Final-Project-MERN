@@ -7,7 +7,6 @@ import {
 import { v2 as cloudinary } from "cloudinary";
 import { json2csv } from "json-2-csv";
 
-
 export const createListing = async (req: Request, res: Response) => {
   const { title, description, price, category, location } = req.body;
 
@@ -279,9 +278,7 @@ export const deleteListingImage = async (req: Request, res: Response) => {
       });
     }
 
-    const publicId = imageUrl.split("/").slice(-2).join("/").split(".")[0];
-
-    await cloudinary.uploader.destroy(publicId);
+    await deleteFromCloudinary(imageUrl);
 
     listing.images = listing.images.filter((img) => img !== imageUrl);
     await listing.save();
@@ -295,7 +292,6 @@ export const deleteListingImage = async (req: Request, res: Response) => {
     });
   }
 };
-
 
 export const getUserListingCSVData = async (req: Request, res: Response) => {
   try {
@@ -323,7 +319,7 @@ export const getUserListingCSVData = async (req: Request, res: Response) => {
 
     res.setHeader("Content-Type", "text/csv");
     res.setHeader("Content-Disposition", "attachment; filename=listings.csv");
-    
+
     return res.status(200).send(csv);
   } catch (error) {
     return res.status(500).json({
