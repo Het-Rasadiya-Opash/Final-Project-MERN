@@ -6,6 +6,7 @@ import { dbConnection } from "./config/db.js";
 import errorHandler from "./middlewares/error.middleware.js";
 import userRoutes from "./routes/user.route.js";
 import listingRoutes from "./routes/listing.route.js";
+import reviewRoutes from "./routes/review.route.js";
 import cors from "cors";
 
 const app: Application = express();
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/user", userRoutes);
 app.use("/api/listing", listingRoutes);
+app.use("/api/review", reviewRoutes);
 
 app.use(errorHandler);
 

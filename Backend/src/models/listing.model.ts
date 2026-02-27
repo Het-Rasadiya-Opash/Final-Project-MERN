@@ -8,7 +8,7 @@ interface Listing {
   location: string;
   category: "rooms" | "beachfront" | "cabins" | "trending" | "city" | "countryside";
   owner: mongoose.Types.ObjectId;
-  review?: mongoose.Types.ObjectId;
+  reviews?: mongoose.Types.ObjectId[];
 }
 
 interface ListingDocument extends Listing, mongoose.Document {}
@@ -57,10 +57,12 @@ const listingSchema = new mongoose.Schema<ListingDocument>(
       ref: "User",
       required: [true, "Owner is Required"],
     },
-    review: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Review",
-    },
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
   },
   {
     timestamps: true,
