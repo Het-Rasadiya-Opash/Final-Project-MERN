@@ -277,7 +277,7 @@ const AdminDashboard = () => {
                           <td className="px-4 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                                {booking.user?.username
+                                {booking.customer?.username
                                   ?.charAt(0)
                                   .toUpperCase() || "U"}
                               </div>
@@ -384,9 +384,18 @@ const AdminDashboard = () => {
                       ))}
                     {activeTab === "user" &&
                       users.map((user: any) => (
-                        <tr key={user._id}>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {user.username}
+                        <tr key={user._id} className="hover:bg-gray-50">
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                                {user?.username?.charAt(0).toUpperCase() || "U"}
+                              </div>
+                              <div className="ml-3">
+                                <div className="text-sm font-medium text-gray-900">
+                                  {user.username}
+                                </div>
+                              </div>
+                            </div>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                             {user.email}
