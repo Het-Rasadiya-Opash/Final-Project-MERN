@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { listingModel } from "../models/listing.model.js";
+import { reviewModel } from "../models/review.model.js";
 import {
   uploadOnCloudinary,
   deleteFromCloudinary,
@@ -7,7 +8,8 @@ import {
 import { json2csv } from "json-2-csv";
 
 export const createListing = async (req: Request, res: Response) => {
-  const { title, description, price, category, location, coordinates } = req.body;
+  const { title, description, price, category, location, coordinates } =
+    req.body;
 
   if (!title || !price || !location || !coordinates) {
     return res.status(400).json({
@@ -40,15 +42,18 @@ export const createListing = async (req: Request, res: Response) => {
 
   try {
     let parsedCoordinates = coordinates;
-    
-    if (typeof coordinates === 'string') {
+
+    if (typeof coordinates === "string") {
       parsedCoordinates = JSON.parse(coordinates);
     }
-    
+
     if (Array.isArray(parsedCoordinates) && parsedCoordinates.length === 2) {
-      parsedCoordinates = [Number(parsedCoordinates[0]), Number(parsedCoordinates[1])];
+      parsedCoordinates = [
+        Number(parsedCoordinates[0]),
+        Number(parsedCoordinates[1]),
+      ];
     }
-    
+
     const listing = await listingModel.create({
       title,
       description,
@@ -167,10 +172,11 @@ export const getUserListing = async (req: Request, res: Response) => {
 
 export const userDeleteListing = async (req: Request, res: Response) => {
   const { listingId } = req.params;
+
   const ownerId = (req as any).user._id;
   try {
     const listing = await listingModel.findById(listingId);
-
+    console.log(listing);
     if (!listing) {
       return res.status(404).json({
         success: false,
@@ -186,6 +192,10 @@ export const userDeleteListing = async (req: Request, res: Response) => {
     }
 
     await Promise.all(listing.images.map((url) => deleteFromCloudinary(url)));
+
+    if (listing.reviews && listing.reviews.length > 0) {
+      await reviewModel.deleteMany({ _id: { $in: listing.reviews } });
+    }
 
     await listingModel.findByIdAndDelete(listingId);
 
@@ -205,7 +215,8 @@ export const userDeleteListing = async (req: Request, res: Response) => {
 export const updateListing = async (req: Request, res: Response) => {
   const { listingId } = req.params;
   const ownerId = (req as any).user._id;
-  const { title, description, price, category, location, coordinates } = req.body;
+  const { title, description, price, category, location, coordinates } =
+    req.body;
 
   try {
     const listing = await listingModel.findById(listingId);
@@ -250,15 +261,18 @@ export const updateListing = async (req: Request, res: Response) => {
 
     if (coordinates) {
       let parsedCoordinates = coordinates;
-      
-      if (typeof coordinates === 'string') {
+
+      if (typeof coordinates === "string") {
         parsedCoordinates = JSON.parse(coordinates);
       }
-      
+
       if (Array.isArray(parsedCoordinates) && parsedCoordinates.length === 2) {
-        parsedCoordinates = [Number(parsedCoordinates[0]), Number(parsedCoordinates[1])];
+        parsedCoordinates = [
+          Number(parsedCoordinates[0]),
+          Number(parsedCoordinates[1]),
+        ];
       }
-      
+
       updateData.geometry = {
         coordinates: parsedCoordinates,
       };
@@ -359,5 +373,3 @@ export const getUserListingCSVData = async (req: Request, res: Response) => {
     });
   }
 };
-
-
