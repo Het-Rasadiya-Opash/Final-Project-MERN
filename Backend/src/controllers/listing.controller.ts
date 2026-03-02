@@ -176,7 +176,6 @@ export const userDeleteListing = async (req: Request, res: Response) => {
   const ownerId = (req as any).user._id;
   try {
     const listing = await listingModel.findById(listingId);
-    console.log(listing);
     if (!listing) {
       return res.status(404).json({
         success: false,
