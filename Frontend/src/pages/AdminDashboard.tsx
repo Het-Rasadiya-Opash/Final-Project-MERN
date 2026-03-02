@@ -7,7 +7,6 @@ import {
   Menu,
   X,
   Trash2,
-  Calendar,
 } from "lucide-react";
 
 const AdminDashboard = () => {
