@@ -11,7 +11,10 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
@@ -20,8 +23,7 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-
-  const handleLogout =async () => {
+  const handleLogout = async () => {
     try {
       await apiRequest.post("/user/logout", {});
       removeCurrentUser();
@@ -41,7 +43,7 @@ const Navbar = () => {
           <div className="flex space-x-4">
             {currentUser ? (
               <div ref={dropdownRef} className="relative">
-                <div 
+                <div
                   onClick={() => setShowDropdown(!showDropdown)}
                   className="flex items-center cursor-pointer"
                 >
@@ -51,6 +53,14 @@ const Navbar = () => {
                 </div>
                 {showDropdown && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                    {currentUser.admin && (
+                      <Link
+                        to="/admin"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      >
+                        Dashboard
+                      </Link>
+                    )}
                     <Link
                       to="/profile"
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
