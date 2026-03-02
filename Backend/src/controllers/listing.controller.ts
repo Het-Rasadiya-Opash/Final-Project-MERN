@@ -6,6 +6,7 @@ import {
   deleteFromCloudinary,
 } from "../config/cloudinary.js";
 import { json2csv } from "json-2-csv";
+import { userModel } from "../models/user.model.js";
 
 export const createListing = async (req: Request, res: Response) => {
   const { title, description, price, category, location, coordinates } =
@@ -174,6 +175,8 @@ export const userDeleteListing = async (req: Request, res: Response) => {
   const { listingId } = req.params;
 
   const ownerId = (req as any).user._id;
+  const isAdmin = (req as any).user.admin;
+  
   try {
     const listing = await listingModel.findById(listingId);
     if (!listing) {
@@ -183,7 +186,7 @@ export const userDeleteListing = async (req: Request, res: Response) => {
       });
     }
 
-    if (listing.owner.toString() !== ownerId.toString()) {
+    if (!isAdmin && listing.owner.toString() !== ownerId.toString()) {
       return res.status(403).json({
         success: false,
         message: "You are not authorized to delete this listing",

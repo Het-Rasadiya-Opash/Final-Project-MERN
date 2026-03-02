@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import apiRequest from "../utils/apiRequest";
-import { Users, Home, MessageSquare, Menu, X } from "lucide-react";
+import { Users, Home, MessageSquare, Menu, X, Trash2 } from "lucide-react";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -76,6 +76,18 @@ const AdminDashboard = () => {
       ))}
     </nav>
   );
+
+  const handleDeleteListing = async (listingId: string) => {
+    if (!confirm("Are you sure you want to delete this listing?")) return;
+
+    try {
+      await apiRequest.delete(`/listing/${listingId}`);
+      setListings(listings.filter((l: any) => l._id !== listingId));
+    } catch (error) {
+      console.error("Error deleting listing:", error);
+      alert("Failed to delete listing");
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
@@ -161,6 +173,9 @@ const AdminDashboard = () => {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                           Type
                         </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Action
+                        </th>
                       </tr>
                     )}
                     {activeTab === "review" && (
@@ -208,6 +223,14 @@ const AdminDashboard = () => {
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                             {listing.category}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm">
+                            <button
+                              onClick={() => handleDeleteListing(listing._id)}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
                           </td>
                         </tr>
                       ))}
