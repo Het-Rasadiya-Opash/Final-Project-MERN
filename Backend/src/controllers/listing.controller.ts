@@ -205,7 +205,7 @@ export const userDeleteListing = async (req: Request, res: Response) => {
 export const updateListing = async (req: Request, res: Response) => {
   const { listingId } = req.params;
   const ownerId = (req as any).user._id;
-  const { title, description, price, category, location } = req.body;
+  const { title, description, price, category, location, coordinates } = req.body;
 
   try {
     const listing = await listingModel.findById(listingId);
@@ -239,16 +239,34 @@ export const updateListing = async (req: Request, res: Response) => {
       imageUrls = [...imageUrls, ...newImageUrls];
     }
 
+    const updateData: any = {
+      title,
+      description,
+      price,
+      category,
+      location,
+      images: imageUrls,
+    };
+
+    if (coordinates) {
+      let parsedCoordinates = coordinates;
+      
+      if (typeof coordinates === 'string') {
+        parsedCoordinates = JSON.parse(coordinates);
+      }
+      
+      if (Array.isArray(parsedCoordinates) && parsedCoordinates.length === 2) {
+        parsedCoordinates = [Number(parsedCoordinates[0]), Number(parsedCoordinates[1])];
+      }
+      
+      updateData.geometry = {
+        coordinates: parsedCoordinates,
+      };
+    }
+
     const updatedListing = await listingModel.findByIdAndUpdate(
       listingId,
-      {
-        title,
-        description,
-        price,
-        category,
-        location,
-        images: imageUrls,
-      },
+      updateData,
       { new: true },
     );
 

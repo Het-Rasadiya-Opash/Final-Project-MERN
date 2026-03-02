@@ -20,6 +20,7 @@ const EditListing = () => {
     price: "",
     category: "rooms",
     location: "",
+    coordinates: [0, 0] as [number, number],
   });
   const [images, setImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
@@ -38,6 +39,7 @@ const EditListing = () => {
           price: listing.price,
           category: listing.category,
           location: listing.location,
+          coordinates: listing.geometry?.coordinates || [0, 0],
         });
         setExistingImages(listing.images || []);
       } catch (err) {
@@ -57,8 +59,7 @@ const EditListing = () => {
     data.append("description", formData.description);
     data.append("price", formData.price);
     data.append("category", formData.category);
-    data.append("location", formData.location);
-    images.forEach((image) => data.append("images", image));
+    data.append("coordinates", JSON.stringify(formData.coordinates));
 
     try {
       await apiRequest.put(`/listing/${listingId}`, data, {
@@ -235,6 +236,40 @@ const EditListing = () => {
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
+        </div>
+
+        <div>
+          <label className="block text-gray-700 mb-2 font-medium">
+            Coordinates (Latitude, Longitude)
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              step="any"
+              placeholder="Latitude"
+              value={formData.coordinates[0]}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  coordinates: [Number(e.target.value), formData.coordinates[1]],
+                })
+              }
+              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              type="number"
+              step="any"
+              placeholder="Longitude"
+              value={formData.coordinates[1]}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  coordinates: [formData.coordinates[0], Number(e.target.value)],
+                })
+              }
+              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
         </div>
 
         <div>
