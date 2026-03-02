@@ -1,6 +1,19 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 
-const bookingSchema = new mongoose.Schema({
+export interface IBooking {
+  listing: mongoose.Types.ObjectId;
+  customer: mongoose.Types.ObjectId;
+  checkIn: Date;
+  checkOut: Date;
+  date: Date;
+  guests: number;
+  totalPrice: number;
+  status: "pending" | "confirmed" | "cancelled";
+}
+
+export interface IBookingDocument extends IBooking, Document {}
+
+const bookingSchema = new mongoose.Schema<IBookingDocument>({
   listing: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Listing",
@@ -38,3 +51,7 @@ const bookingSchema = new mongoose.Schema({
     default: "pending",
   },
 });
+
+export const bookingModel = mongoose.model<IBookingDocument>("Booking", bookingSchema);
+
+
