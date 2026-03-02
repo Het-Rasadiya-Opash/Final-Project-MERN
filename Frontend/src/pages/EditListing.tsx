@@ -39,7 +39,9 @@ const EditListing = () => {
           price: listing.price,
           category: listing.category,
           location: listing.location,
-          coordinates: listing.geometry?.coordinates || [0, 0],
+          coordinates: listing.geometry?.coordinates && Array.isArray(listing.geometry.coordinates) && listing.geometry.coordinates.length === 2 
+            ? [Number(listing.geometry.coordinates[0]) || 0, Number(listing.geometry.coordinates[1]) || 0]
+            : [0, 0],
         });
         setExistingImages(listing.images || []);
       } catch (err) {
@@ -59,7 +61,9 @@ const EditListing = () => {
     data.append("description", formData.description);
     data.append("price", formData.price);
     data.append("category", formData.category);
+    data.append("location", formData.location);
     data.append("coordinates", JSON.stringify(formData.coordinates));
+    images.forEach((image) => data.append("images", image));
 
     try {
       await apiRequest.put(`/listing/${listingId}`, data, {
@@ -247,7 +251,7 @@ const EditListing = () => {
               type="number"
               step="any"
               placeholder="Latitude"
-              value={formData.coordinates[0]}
+              value={formData.coordinates[0] || 0}
               onChange={(e) =>
                 setFormData({
                   ...formData,
@@ -260,7 +264,7 @@ const EditListing = () => {
               type="number"
               step="any"
               placeholder="Longitude"
-              value={formData.coordinates[1]}
+              value={formData.coordinates[1] || 0}
               onChange={(e) =>
                 setFormData({
                   ...formData,
