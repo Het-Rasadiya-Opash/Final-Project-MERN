@@ -9,6 +9,7 @@ import EditListing from "./pages/EditListing";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import AdminRoutes from "./components/AdminRoutes";
 import AdminDashboard from "./pages/AdminDashboard";
+import BookingForm from "./pages/BookingForm";
 
 const App = () => {
   return (
@@ -23,9 +24,10 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/create-listing" element={<CreateListing />} />
           <Route path="/update-listing/:listingId" element={<EditListing />} />
+          <Route path="/booking/:listingId" element={<BookingForm />} />
         </Route>
         <Route element={<AdminRoutes />}>
-          <Route path="/admin" element={<AdminDashboard/>} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Route>
       </Routes>
     </>
