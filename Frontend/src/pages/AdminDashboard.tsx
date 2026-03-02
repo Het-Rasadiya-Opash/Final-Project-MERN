@@ -83,9 +83,24 @@ const AdminDashboard = () => {
     try {
       await apiRequest.delete(`/listing/${listingId}`);
       setListings(listings.filter((l: any) => l._id !== listingId));
+      setStats((prev) => ({ ...prev, totalListings: prev.totalListings - 1 }));
     } catch (error) {
       console.error("Error deleting listing:", error);
       alert("Failed to delete listing");
+    }
+  };
+
+  const handleDeleteReview = async (reviewId: string, listingId: string) => {
+    if (!confirm("Are you sure you want to delete this review?")) return;
+    try {
+        await apiRequest.delete(`/review/delete/${listingId}`, {
+        data: { reviewId },
+      });
+      setReviews(reviews.filter((r: any) => r._id !== reviewId));
+      setStats((prev) => ({ ...prev, totalReviews: prev.totalReviews - 1 }));
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      alert("Failed to delete review");
     }
   };
 
@@ -189,6 +204,9 @@ const AdminDashboard = () => {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                           Rating
                         </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Action
+                        </th>
                       </tr>
                     )}
                     {activeTab === "user" && (
@@ -245,6 +263,16 @@ const AdminDashboard = () => {
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                             ⭐ {review.rating}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm">
+                            <button
+                              onClick={() =>
+                                handleDeleteReview(review._id, review.listing)
+                              }
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
                           </td>
                         </tr>
                       ))}
