@@ -8,6 +8,7 @@ const Profile = () => {
   const { currentUser } = useAuthStore();
   const [listings, setListings] = useState<any>([]);
   const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState<any>([]);
 
   if (!currentUser)
     return <div className="p-8">Please log in to view your profile.</div>;
@@ -24,6 +25,21 @@ const Profile = () => {
       }
     };
     fetchUserListing();
+  }, []);
+
+  useEffect(() => {
+    const fetchUserBooking = async () => {
+      try {
+        const res = await apiRequest.get(`/booking/user`);
+        setBookings(res.data);
+        console.log(res.data);
+      } catch (error) {
+        console.log("Failed to fetch bookings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserBooking();
   }, []);
 
   const handleExportCSV = async () => {
@@ -75,6 +91,64 @@ const Profile = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="bg-white shadow-lg rounded-2xl p-6 mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="bg-blue-50 p-2.5 rounded-xl shadow-sm border border-blue-100">
+              <Calendar size={20} className="text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Your Bookings</h2>
+              <p className="text-sm text-gray-500">Total: {bookings.length} {bookings.length === 1 ? 'Booking' : 'Bookings'}</p>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+            </div>
+          ) : bookings.length === 0 ? (
+            <div className="text-center py-8">
+              <Calendar size={48} className="mx-auto text-gray-300 mb-3" />
+              <p className="text-gray-500">No bookings yet</p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {bookings.map((booking: any) => (
+                <div key={booking._id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="w-full sm:w-32 h-24 bg-gray-200 rounded-lg overflow-hidden">
+                      <img 
+                        src={booking.listing?.images?.[0] || '/placeholder.jpg'} 
+                        alt={booking.listing?.title || 'Listing'}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 mb-1">{booking.listing?.title || 'Listing'}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{booking.listing?.location}</p>
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                        <span>Check-in: {new Date(booking.checkIn).toLocaleDateString("en-GB")}</span>
+                        <span>Check-out: {new Date(booking.checkOut).toLocaleDateString("en-GB")}</span>
+                        <span>Guests: {booking.guests}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-lg text-gray-900">₹{booking.totalPrice?.toLocaleString()}</p>
+                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                        booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                        booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {booking.status || 'Pending'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="bg-white shadow-lg rounded-2xl p-6">
