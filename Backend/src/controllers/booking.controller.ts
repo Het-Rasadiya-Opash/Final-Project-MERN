@@ -65,3 +65,15 @@ export const getAllBookings = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error fetching bookings" });
   }
 };
+
+export const getUserBookings = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user._id;
+    const bookings = await bookingModel
+      .find({ customer: userId })
+      .populate("listing");
+    res.status(200).json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching bookings" });
+  }
+};
