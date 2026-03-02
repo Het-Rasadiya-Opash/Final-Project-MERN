@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import apiRequest from "../utils/apiRequest";
-import { Users, Home, MessageSquare, Menu, X, Trash2 } from "lucide-react";
+import {
+  Users,
+  Home,
+  MessageSquare,
+  Menu,
+  X,
+  Trash2,
+  Calendar,
+} from "lucide-react";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -13,6 +21,7 @@ const AdminDashboard = () => {
   const [listings, setListings] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [users, setUsers] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,6 +39,19 @@ const AdminDashboard = () => {
       }
     };
     fetchStats();
+  }, []);
+
+  useEffect(() => {
+    const fetchAllBookings = async () => {
+      try {
+        const res = await apiRequest.get("/booking/");
+        console.log(res.data);
+        setBookings(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchAllBookings();
   }, []);
 
   const statCards = [
@@ -58,7 +80,7 @@ const AdminDashboard = () => {
 
   const NavItems = () => (
     <nav className="p-4">
-      {["overview", "listing", "review", "user"].map((tab) => (
+      {["overview", "listing", "review", "user", "bookings"].map((tab) => (
         <button
           key={tab}
           onClick={() => {
@@ -93,7 +115,7 @@ const AdminDashboard = () => {
   const handleDeleteReview = async (reviewId: string, listingId: string) => {
     if (!confirm("Are you sure you want to delete this review?")) return;
     try {
-        await apiRequest.delete(`/review/delete/${listingId}`, {
+      await apiRequest.delete(`/review/delete/${listingId}`, {
         data: { reviewId },
       });
       setReviews(reviews.filter((r: any) => r._id !== reviewId));
@@ -225,8 +247,92 @@ const AdminDashboard = () => {
                         </th>
                       </tr>
                     )}
+                    {activeTab === "bookings" && (
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          User
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Listing
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Dates
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Guests
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Total
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Status
+                        </th>
+                      </tr>
+                    )}
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
+                    {activeTab === "bookings" &&
+                      bookings.map((booking: any) => (
+                        <tr key={booking._id} className="hover:bg-gray-50">
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                                {booking.user?.username
+                                  ?.charAt(0)
+                                  .toUpperCase() || "U"}
+                              </div>
+                              <div className="ml-3">
+                                <div className="text-sm font-medium text-gray-900">
+                                  {booking.customer?.username || "Unknown"}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {booking.customer?.email || "No email"}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="text-sm font-medium text-gray-900 truncate max-w-xs">
+                              {booking.listing?.title || "Deleted Listing"}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {booking.listing?.location || "Unknown location"}
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">
+                              {new Date(booking.checkIn).toLocaleDateString()}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              to{" "}
+                              {new Date(booking.checkOut).toLocaleDateString()}
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {booking.guests}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">
+                              ₹{booking.totalPrice?.toLocaleString() || "N/A"}
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                booking.status === "confirmed"
+                                  ? "bg-green-100 text-green-800"
+                                  : booking.status === "pending"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : booking.status === "cancelled"
+                                      ? "bg-red-100 text-red-800"
+                                      : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {booking.status || "pending"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                     {activeTab === "listing" &&
                       listings.map((listing: any) => (
                         <tr key={listing._id}>
