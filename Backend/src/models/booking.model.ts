@@ -5,9 +5,9 @@ export interface IBooking {
   customer: mongoose.Types.ObjectId;
   checkIn: Date;
   checkOut: Date;
-  date: Date;
   guests: number;
   totalPrice: number;
+  stayDay: number;
   status: "pending" | "confirmed" | "cancelled";
 }
 
@@ -32,16 +32,15 @@ const bookingSchema = new mongoose.Schema<IBookingDocument>({
     type: Date,
     required: true,
   },
-  date: {
-    type: Date,
-    default: Date.now,
-    required: true,
-  },
   guests: {
     type: Number,
     required: true,
   },
   totalPrice: {
+    type: Number,
+    required: true,
+  },
+  stayDay: {
     type: Number,
     required: true,
   },
@@ -52,6 +51,7 @@ const bookingSchema = new mongoose.Schema<IBookingDocument>({
   },
 });
 
-export const bookingModel = mongoose.model<IBookingDocument>("Booking", bookingSchema);
-
-
+export const bookingModel = mongoose.model<IBookingDocument>(
+  "Booking",
+  bookingSchema,
+);

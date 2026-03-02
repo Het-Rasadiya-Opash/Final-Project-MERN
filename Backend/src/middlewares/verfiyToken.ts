@@ -6,7 +6,7 @@ interface JwtPayload {
   userId: string;
 }
 
-export const verifyToken =async (
+export const verifyToken = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -15,7 +15,7 @@ export const verifyToken =async (
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
     const user = await userModel.findById(decoded.userId);
@@ -28,3 +28,4 @@ export const verifyToken =async (
     return res.status(401).json({ message: "Invalid token" });
   }
 };
+
