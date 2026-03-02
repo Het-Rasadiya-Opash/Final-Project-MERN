@@ -5,6 +5,7 @@ export interface User {
   username: string;
   email: string;
   password: string;
+  admin: boolean;
 }
 
 interface UserDocument extends User, mongoose.Document {
@@ -35,6 +36,10 @@ const userSchema = new mongoose.Schema<UserDocument>(
       required: [true, "Password is required"],
       minlength: [6, "Password must be at least 6 characters long"],
       select: false,
+    },
+    admin: {
+      type: Boolean,
+      default: false,
     },
   },
   {
