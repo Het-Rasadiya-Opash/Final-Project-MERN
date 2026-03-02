@@ -5,7 +5,6 @@ import { listingModel } from "../models/listing.model.js";
 export const createReview = async (req: Request, res: Response) => {
   const { comment, rating } = req.body;
   const { listingId } = req.params;
-  console.log(comment, rating);
 
   if (!comment || !rating) {
     return res.status(400).json({
@@ -19,6 +18,7 @@ export const createReview = async (req: Request, res: Response) => {
       comment,
       rating,
       owner: (req as any).user?._id,
+      listing: listingId as string,
     });
 
     const listing = await listingModel.findByIdAndUpdate(

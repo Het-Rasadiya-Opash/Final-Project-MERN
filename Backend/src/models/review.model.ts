@@ -4,6 +4,7 @@ interface Review {
   comment: string;
   rating: number;
   owner: mongoose.Types.ObjectId;
+  listing: mongoose.Types.ObjectId;
 }
 
 interface ReviewDocument extends Review, mongoose.Document {}
@@ -25,10 +26,18 @@ const reviewSchema = new mongoose.Schema<ReviewDocument>(
       ref: "User",
       required: [true, "Owner is Required"],
     },
+    listing: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Listing",
+      required: [true, "Listing is Required"],
+    },
   },
   {
     timestamps: true,
   },
 );
 
-export const reviewModel = mongoose.model<ReviewDocument>("Review", reviewSchema);
+export const reviewModel = mongoose.model<ReviewDocument>(
+  "Review",
+  reviewSchema,
+);

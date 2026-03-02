@@ -9,11 +9,6 @@ const router = express.Router();
 
 router.post("/create/:listingId", verifyToken, createReview);
 router.get("/:listingId", getReviewofListing);
-router.delete(
-  "/delete/:listingId",
-  verifyToken,
-  verifyToken,
-  deleteReviewofListing,
-);
+router.delete("/delete/:listingId", verifyToken, deleteReviewofListing);
 
 export default router;
