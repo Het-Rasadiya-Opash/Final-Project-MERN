@@ -202,10 +202,15 @@ const ListingPage = () => {
       <div className="mt-8 border-t pt-8">
         <h2 className="text-2xl font-bold mb-6">Reviews</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-            <h3 className="text-xl font-semibold mb-4">Leave a Review</h3>
-            <ReviewForm listingId={id} onReviewAdded={() => setReviewRefresh(prev => prev + 1)} />
-          </div>
+          {currentUser && (
+            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+              <h3 className="text-xl font-semibold mb-4">Leave a Review</h3>
+              <ReviewForm
+                listingId={id}
+                onReviewAdded={() => setReviewRefresh((prev) => prev + 1)}
+              />
+            </div>
+          )}
           <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             <h3 className="text-xl font-semibold mb-4">All Reviews</h3>
             <Review listingId={id} refreshTrigger={reviewRefresh} />
