@@ -235,7 +235,7 @@ const AdminDashboard = () => {
                             {user.email}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {user.role || "User"}
+                            {user.admin ? "Admin" : "User"}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                             {new Date(user.createdAt).toLocaleDateString()}
