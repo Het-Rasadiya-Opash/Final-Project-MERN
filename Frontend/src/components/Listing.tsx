@@ -18,7 +18,6 @@ interface ListingProps {
 const Listing = ({ listing }: ListingProps) => {
   const navigate = useNavigate();
 
-
   return (
     <div
       onClick={() => navigate(`/listing/${listing._id}`)}
@@ -55,11 +54,14 @@ const Listing = ({ listing }: ListingProps) => {
           </p>
         )}
         {listing.price && (
-          <p className="text-xl sm:text-2xl font-bold text-blue-600">
+          <p className="text-xl sm:text-xl font-bold text-blue-600">
             ₹{listing.price.toLocaleString()}
+            <span className="text-base md:text-lg font-normal text-gray-600">
+              {" "}
+              / per night
+            </span>
           </p>
         )}
-        
       </div>
     </div>
   );
