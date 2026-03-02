@@ -19,11 +19,14 @@ const CreateListing = () => {
     price: "",
     location: "",
     category: "rooms",
+    longitude: "",
+    latitude: "",
   });
   const [images, setImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [gettingLocation, setGettingLocation] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +39,7 @@ const CreateListing = () => {
     data.append("price", formData.price);
     data.append("location", formData.location);
     data.append("category", formData.category);
+    data.append("coordinates", JSON.stringify([Number(formData.longitude), Number(formData.latitude)]));
     images.forEach((image) => data.append("images", image));
 
     try {
@@ -64,6 +68,29 @@ const CreateListing = () => {
       URL.revokeObjectURL(prev[index]);
       return prev.filter((_, i) => i !== index);
     });
+  };
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setGettingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setFormData({
+          ...formData,
+          longitude: position.coords.longitude.toString(),
+          latitude: position.coords.latitude.toString(),
+        });
+        setGettingLocation(false);
+      },
+      () => {
+        setError("Unable to retrieve your location");
+        setGettingLocation(false);
+      }
+    );
   };
 
   return (
@@ -184,6 +211,54 @@ const CreateListing = () => {
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-gray-700 font-medium">
+              Coordinates *
+            </label>
+            <button
+              type="button"
+              onClick={getCurrentLocation}
+              disabled={gettingLocation}
+              className="text-sm bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-3 py-1 rounded transition"
+            >
+              {gettingLocation ? "Getting..." : "📍 Get Current Location"}
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-gray-600 text-sm mb-1">
+                Longitude
+              </label>
+              <input
+                type="number"
+                step="any"
+                value={formData.longitude}
+                onChange={(e) =>
+                  setFormData({ ...formData, longitude: e.target.value })
+                }
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-gray-600 text-sm mb-1">
+                Latitude
+              </label>
+              <input
+                type="number"
+                step="any"
+                value={formData.latitude}
+                onChange={(e) =>
+                  setFormData({ ...formData, latitude: e.target.value })
+                }
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+          </div>
         </div>
 
         <div>

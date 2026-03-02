@@ -4,13 +4,12 @@ import {
   uploadOnCloudinary,
   deleteFromCloudinary,
 } from "../config/cloudinary.js";
-import { v2 as cloudinary } from "cloudinary";
 import { json2csv } from "json-2-csv";
 
 export const createListing = async (req: Request, res: Response) => {
-  const { title, description, price, category, location } = req.body;
+  const { title, description, price, category, location, coordinates } = req.body;
 
-  if (!title || !price || !location) {
+  if (!title || !price || !location || !coordinates) {
     return res.status(400).json({
       success: false,
       message: "All fields are required",
@@ -40,6 +39,16 @@ export const createListing = async (req: Request, res: Response) => {
   }
 
   try {
+    let parsedCoordinates = coordinates;
+    
+    if (typeof coordinates === 'string') {
+      parsedCoordinates = JSON.parse(coordinates);
+    }
+    
+    if (Array.isArray(parsedCoordinates) && parsedCoordinates.length === 2) {
+      parsedCoordinates = [Number(parsedCoordinates[0]), Number(parsedCoordinates[1])];
+    }
+    
     const listing = await listingModel.create({
       title,
       description,
@@ -47,6 +56,9 @@ export const createListing = async (req: Request, res: Response) => {
       category,
       location,
       images: imageUrls,
+      geometry: {
+        coordinates: parsedCoordinates,
+      },
       owner: (req as any).user._id,
     });
 

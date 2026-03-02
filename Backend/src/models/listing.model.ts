@@ -6,9 +6,26 @@ interface Listing {
   price: number;
   images: string[];
   location: string;
-  category: "rooms" | "beachfront" | "cabins" | "trending" | "city" | "countryside";
+  category:
+    | "rooms"
+    | "beachfront"
+    | "cabins"
+    | "trending"
+    | "city"
+    | "countryside";
   owner: mongoose.Types.ObjectId;
   reviews?: mongoose.Types.ObjectId[];
+  geometry: {
+    type: {
+      type: String;
+      enum: ["Point"];
+      required: true;
+    };
+    coordinates: {
+      type: [Number];
+      required: true;
+    };
+  };
 }
 
 interface ListingDocument extends Listing, mongoose.Document {}
@@ -52,6 +69,17 @@ const listingSchema = new mongoose.Schema<ListingDocument>(
       default: "rooms",
       index: true,
     },
+    geometry: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -69,4 +97,7 @@ const listingSchema = new mongoose.Schema<ListingDocument>(
   },
 );
 
-export const listingModel = mongoose.model<ListingDocument>("Listing", listingSchema);
+export const listingModel = mongoose.model<ListingDocument>(
+  "Listing",
+  listingSchema,
+);

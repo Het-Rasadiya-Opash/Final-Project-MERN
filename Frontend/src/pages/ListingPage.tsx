@@ -4,6 +4,7 @@ import apiRequest from "../utils/apiRequest";
 import useAuthStore from "../utils/authStore";
 import ReviewForm from "../components/ReviewForm";
 import Review from "../components/Review";
+import Map from "../components/Map";
 
 const ListingPage = () => {
   const { id } = useParams();
@@ -198,6 +199,17 @@ const ListingPage = () => {
           )}
         </div>
       </div>
+
+      {listing.geometry?.coordinates && (
+        <div className="mt-8 border-t pt-8">
+          <h2 className="text-2xl font-bold mb-6">Location</h2>
+          <Map
+            latitude={listing.geometry.coordinates[1]}
+            longitude={listing.geometry.coordinates[0]}
+            title={listing.title}
+          />
+        </div>
+      )}
 
       <div className="mt-8 border-t pt-8">
         <h2 className="text-2xl font-bold mb-6">Reviews</h2>
