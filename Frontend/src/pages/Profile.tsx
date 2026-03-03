@@ -159,14 +159,18 @@ const Profile = () => {
                           {booking.status || 'Pending'}
                         </span>
                       </div>
-                      <div className="flex sm:justify-end sm:mt-2">
-                        <button
-                          onClick={() => handleDeleteBooking(booking._id)}
-                          className="text-red-600 hover:text-red-800 transition-colors"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </div>
+                      {
+                        booking.status === "pending" && (
+                          <div className="flex sm:justify-end sm:mt-2">
+                            <button
+                              onClick={() => handleDeleteBooking(booking._id)}
+                              className="text-red-600 hover:text-red-800 transition-colors"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </div>
+                        )
+                      }
                     </div>
                   </div>
                 </div>
