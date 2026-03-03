@@ -59,7 +59,7 @@ const Profile = () => {
 
   const handleCheckout = async (booking: any) => {
     try {
-      const response = await apiRequest.post(`/create-checkout-session`, {
+      const response = await apiRequest.post(`/payment/create-checkout-session`, {
         listing: booking.listing,
         bookingId: booking._id,
         stayDay: booking.stayDay
