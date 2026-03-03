@@ -105,36 +105,41 @@ const EditListing = () => {
     });
   };
 
-  return (
-    <div className="max-w-2xl mx-auto p-4 sm:p-6">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6">Edit Listing</h1>
+ return (
+  <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+    <div className="bg-white shadow-xl rounded-2xl p-6 sm:p-8 space-y-6 border border-gray-100">
+      
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+        Edit Listing
+      </h1>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+        <div className="p-3 bg-red-50 text-red-600 border border-red-200 rounded-xl text-sm">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {existingImages.length > 0 || imagePreviews.length > 0 ? (
-          <div className="mb-6">
-            <label className="block text-gray-700 mb-2 font-medium">
+      <form onSubmit={handleSubmit} className="space-y-6">
+
+        {(existingImages.length > 0 || imagePreviews.length > 0) && (
+          <div>
+            <label className="block text-gray-700 font-medium mb-3">
               Images Preview
             </label>
 
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex flex-wrap gap-3">
               {existingImages.map((img, index) => (
-                <div key={`existing-${index}`} className="relative">
+                <div key={`existing-${index}`} className="relative group">
                   <img
                     src={img}
                     alt="preview"
-                    className="w-24 h-24 object-cover rounded-lg border"
+                    className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-xl border shadow-sm"
                   />
 
                   <button
                     type="button"
                     onClick={() => handleDeleteImage(img)}
-                    className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full hover:bg-red-700"
+                    className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition"
                   >
                     ✕
                   </button>
@@ -142,11 +147,11 @@ const EditListing = () => {
               ))}
 
               {imagePreviews.map((preview, index) => (
-                <div key={`new-${index}`} className="relative">
+                <div key={`new-${index}`} className="relative group">
                   <img
                     src={preview}
                     alt="new-preview"
-                    className="w-24 h-24 object-cover rounded-lg border-2 border-blue-500"
+                    className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-xl border-2 border-blue-500 shadow-sm"
                   />
 
                   <span className="absolute top-1 left-1 bg-blue-600 text-white text-[10px] px-1 rounded">
@@ -156,7 +161,7 @@ const EditListing = () => {
                   <button
                     type="button"
                     onClick={() => handleRemoveNewImage(index)}
-                    className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full hover:bg-red-700"
+                    className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition"
                   >
                     ✕
                   </button>
@@ -164,27 +169,28 @@ const EditListing = () => {
               ))}
             </div>
           </div>
-        ) : null}
+        )}
+
         <div>
-          <label className="block text-gray-700 mb-2 font-medium">
-            Images (optional)
+          <label className="block text-gray-700 font-medium mb-2">
+            Add More Images
           </label>
           <input
             type="file"
-            onChange={handleImageChange}
             multiple
             accept="image/*"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={handleImageChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
           />
           {images.length > 0 && (
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-500 mt-1">
               {images.length} new image(s) selected
             </p>
           )}
         </div>
 
         <div>
-          <label className="block text-gray-700 mb-2 font-medium">
+          <label className="block text-gray-700 font-medium mb-2">
             Title *
           </label>
           <input
@@ -193,27 +199,27 @@ const EditListing = () => {
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
             }
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
             required
           />
         </div>
 
         <div>
-          <label className="block text-gray-700 mb-2 font-medium">
+          <label className="block text-gray-700 font-medium mb-2">
             Description
           </label>
           <textarea
+            rows={4}
             value={formData.description}
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
             }
-            rows={4}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
           />
         </div>
 
         <div>
-          <label className="block text-gray-700 mb-2 font-medium">
+          <label className="block text-gray-700 font-medium mb-2">
             Price *
           </label>
           <input
@@ -222,13 +228,13 @@ const EditListing = () => {
             onChange={(e) =>
               setFormData({ ...formData, price: e.target.value })
             }
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
             required
           />
         </div>
 
         <div>
-          <label className="block text-gray-700 mb-2 font-medium">
+          <label className="block text-gray-700 font-medium mb-2">
             Location *
           </label>
           <input
@@ -237,47 +243,55 @@ const EditListing = () => {
             onChange={(e) =>
               setFormData({ ...formData, location: e.target.value })
             }
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
             required
           />
         </div>
 
-        <div>
-          <label className="block text-gray-700 mb-2 font-medium">
-            Coordinates (Latitude, Longitude)
+        <div className="bg-blue-50/40 border border-blue-100 rounded-2xl p-5 space-y-4">
+          <label className="block text-gray-700 font-medium">
+            Coordinates
           </label>
-          <div className="flex gap-2">
+
+          <div className="grid grid-cols-2 gap-4">
             <input
               type="number"
               step="any"
               placeholder="Latitude"
-              value={formData.coordinates[0] || 0}
+              value={formData.coordinates[0]}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  coordinates: [Number(e.target.value), formData.coordinates[1]],
+                  coordinates: [
+                    Number(e.target.value),
+                    formData.coordinates[1],
+                  ],
                 })
               }
-              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
             />
+
             <input
               type="number"
               step="any"
               placeholder="Longitude"
-              value={formData.coordinates[1] || 0}
+              value={formData.coordinates[1]}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  coordinates: [formData.coordinates[0], Number(e.target.value)],
+                  coordinates: [
+                    formData.coordinates[0],
+                    Number(e.target.value),
+                  ],
                 })
               }
-              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-gray-700 mb-2 font-medium">
+          <label className="block text-gray-700 font-medium mb-2">
             Category *
           </label>
           <select
@@ -285,7 +299,7 @@ const EditListing = () => {
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
             }
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
             required
           >
             {categories.map((cat) => (
@@ -299,13 +313,15 @@ const EditListing = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-3 rounded-lg transition duration-200 font-medium"
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-xl font-semibold transition duration-200 shadow-md hover:shadow-lg"
         >
           {loading ? "Updating..." : "Update Listing"}
         </button>
+
       </form>
     </div>
-  );
+  </div>
+);
 };
 
 export default EditListing;

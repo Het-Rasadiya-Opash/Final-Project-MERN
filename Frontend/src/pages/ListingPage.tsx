@@ -55,93 +55,65 @@ const ListingPage = () => {
 
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
-          <div className="relative aspect-video bg-gray-200 rounded-lg overflow-hidden">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+        <div className="space-y-4">
+          <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-gray-100 shadow-sm">
             <img
               src={listing.images[currentImage]}
               alt={listing.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-all duration-300"
             />
-            {/* {listing.images.length > 1 && (
-              <>
-                <button
-                  onClick={() =>
-                    setCurrentImage((prev) =>
-                      prev === 0 ? listing.images.length - 1 : prev - 1,
-                    )
-                  }
-                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70"
-                >
-                  ←
-                </button>
-                <button
-                  onClick={() =>
-                    setCurrentImage((prev) =>
-                      prev === listing.images.length - 1 ? 0 : prev + 1,
-                    )
-                  }
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70"
-                >
-                  →
-                </button>
-              </>
-            )} */}
           </div>
+
           {listing.images.length > 1 && (
-            <div className="flex gap-2 mt-4 overflow-x-auto">
+            <div className="flex gap-3 overflow-x-auto pb-2">
               {listing.images.map((img: string, idx: number) => (
                 <img
                   key={idx}
                   src={img}
                   alt={`${listing.title} ${idx + 1}`}
                   onClick={() => setCurrentImage(idx)}
-                  className={`w-20 h-20 object-cover rounded cursor-pointer ${currentImage === idx ? "ring-2 ring-blue-500" : ""}`}
+                  className={`h-20 w-28 object-cover rounded-lg cursor-pointer transition-all duration-200 ${currentImage === idx
+                      ? "ring-2 ring-blue-500"
+                      : "opacity-70 hover:opacity-100"
+                    }`}
                 />
               ))}
             </div>
           )}
         </div>
 
-        <div>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <h1 className="text-2xl md:text-3xl font-bold">{listing.title}</h1>
-            {
-              (!isOwner && !currentUser?.admin)  && (
-                <Link to={`/booking/${listing._id}`}>
-              <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-all duration-200 border border-blue-200">
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                <span className="font-medium">Book Now</span>
-              </button>
-            </Link>
-              )
-            }
+        <div className="space-y-6">
+
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <h1 className="text-3xl font-bold leading-tight">
+              {listing.title}
+            </h1>
+
+            {(!isOwner && !currentUser?.admin) && (
+              <Link to={`/booking/${listing._id}`}>
+                <button className="whitespace-nowrap px-6 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg border border-blue-200 transition duration-200">
+                  Book Now
+                </button>
+              </Link>
+            )}
           </div>
-          <p className="text-2xl md:text-3xl font-bold text-blue-600 mb-4">
-            ₹{listing.price?.toLocaleString()}
-            <span className="text-base md:text-lg font-normal text-gray-600"> / per night</span>
-          </p>
+
+          <div>
+            <p className="text-3xl font-bold text-blue-600">
+              ₹{listing.price?.toLocaleString()}
+              <span className="text-lg font-normal text-gray-600">
+                {" "} / per night
+              </span>
+            </p>
+          </div>
 
           {listing.location && (
-            <div className="flex items-center text-gray-600 mb-4">
-              <svg
-                className="w-5 h-5 mr-2"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
+            <div className="flex items-center text-gray-600 text-sm">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
                   d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
@@ -153,96 +125,53 @@ const ListingPage = () => {
           )}
 
           {listing.category && (
-            <div className="mb-4">
-              <span className="bg-gray-200 px-3 py-1 rounded-full text-sm">
+            <div>
+              <span className="inline-block bg-gray-200 px-3 py-1 rounded-full text-sm">
                 {listing.category}
               </span>
             </div>
           )}
 
           {listing.description && (
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-2">Description</h2>
-              <p className="text-gray-700 whitespace-pre-line">
+            <div className="pt-4 border-t">
+              <h2 className="text-xl font-semibold mb-2">
+                Description
+              </h2>
+              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
                 {listing.description}
               </p>
             </div>
           )}
 
           {listing.owner && (
-            <div className="border-t pt-4">
-              <h2 className="text-xl font-semibold mb-3">Owner Information</h2>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-gray-700">
-                  <svg
-                    className="w-5 h-5 text-gray-500 shrink-0"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span className="break-all">{listing.owner.username}</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-700">
-                  <svg
-                    className="w-5 h-5 text-gray-500 shrink-0"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                  </svg>
-                  <span className="break-all">{listing.owner.email}</span>
-                </div>
-              </div>
+            <div className="pt-4 border-t space-y-2">
+              <h2 className="text-xl font-semibold">
+                Owner Information
+              </h2>
+              <p className="text-gray-700 text-sm">
+                <span className="font-medium">Username:</span>{" "}
+                {listing.owner.username}
+              </p>
+              <p className="text-gray-700 text-sm break-all">
+                <span className="font-medium">Email:</span>{" "}
+                {listing.owner.email}
+              </p>
             </div>
           )}
+
           {(isOwner || currentUser?.admin) && (
-            <div className="flex flex-wrap gap-2 mt-6">
+            <div className="flex flex-wrap gap-4 pt-6 border-t">
               <Link to={`/update-listing/${listing._id}`}>
-                <button
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-all duration-200 border border-blue-200"
-                  title="Edit listing"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                  <span className="font-medium">Edit</span>
+                <button className="px-6 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg border border-blue-200 transition">
+                  Edit
                 </button>
               </Link>
+
               <button
                 onClick={handleDeleteListing}
-                className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-all duration-200 border border-red-200"
-                title="Delete listing"
+                className="px-6 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg border border-red-200 transition"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
-                <span className="font-medium">Delete</span>
+                Delete
               </button>
             </div>
           )}
@@ -250,31 +179,48 @@ const ListingPage = () => {
       </div>
 
       {listing.geometry?.coordinates && (
-        <div className="mt-8 border-t pt-8">
-          <h2 className="text-2xl font-bold mb-6">Location</h2>
-          <Map
-            latitude={listing.geometry.coordinates[1]}
-            longitude={listing.geometry.coordinates[0]}
-            title={listing.title}
-          />
+        <div className="mt-16 pt-10 border-t">
+          <h2 className="text-2xl font-bold mb-6">
+            Location
+          </h2>
+          <div className="rounded-xl overflow-hidden shadow-sm">
+            <Map
+              latitude={listing.geometry.coordinates[1]}
+              longitude={listing.geometry.coordinates[0]}
+              title={listing.title}
+            />
+          </div>
         </div>
       )}
 
-      <div className="mt-8 border-t pt-8">
-        <h2 className="text-2xl font-bold mb-6">Reviews</h2>
+      <div className="mt-16 pt-10 border-t">
+        <h2 className="text-2xl font-bold mb-8">
+          Reviews
+        </h2>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {currentUser && (
-            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-              <h3 className="text-xl font-semibold mb-4">Leave a Review</h3>
+            <div className="bg-white border rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">
+                Leave a Review
+              </h3>
               <ReviewForm
                 listingId={id}
-                onReviewAdded={() => setReviewRefresh((prev) => prev + 1)}
+                onReviewAdded={() =>
+                  setReviewRefresh((prev) => prev + 1)
+                }
               />
             </div>
           )}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-            <h3 className="text-xl font-semibold mb-4">All Reviews</h3>
-            <Review listingId={id} refreshTrigger={reviewRefresh} />
+
+          <div className="bg-white border rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">
+              All Reviews
+            </h3>
+            <Review
+              listingId={id}
+              refreshTrigger={reviewRefresh}
+            />
           </div>
         </div>
       </div>

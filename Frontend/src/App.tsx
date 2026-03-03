@@ -10,29 +10,29 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import AdminRoutes from "./components/AdminRoutes";
 import AdminDashboard from "./pages/AdminDashboard";
 import BookingForm from "./pages/BookingForm";
-import Success from "./pages/Success";
 
 const App = () => {
   return (
     <>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/auth" element={<AuthPage />} />
+      <Navbar/>
+      <div className="pt-20">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/auth" element={<AuthPage />} />
 
-        {/* <Route path='/sucess' element={<Success/>}/> */}
 
-        <Route path="/listing/:id" element={<ListingPage />} />
-        <Route element={<ProtectedRoutes />}>
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/create-listing" element={<CreateListing />} />
-          <Route path="/update-listing/:listingId" element={<EditListing />} />
-          <Route path="/booking/:listingId" element={<BookingForm />} />
-        </Route>
-        <Route element={<AdminRoutes />}>
-          <Route path="/admin" element={<AdminDashboard />} />
-        </Route>
-      </Routes>
+          <Route path="/listing/:id" element={<ListingPage />} />
+          <Route element={<ProtectedRoutes />}>
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/create-listing" element={<CreateListing />} />
+            <Route path="/update-listing/:listingId" element={<EditListing />} />
+            <Route path="/booking/:listingId" element={<BookingForm />} />
+          </Route>
+          <Route element={<AdminRoutes />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Route>
+        </Routes>
+      </div>
     </>
   );
 };
