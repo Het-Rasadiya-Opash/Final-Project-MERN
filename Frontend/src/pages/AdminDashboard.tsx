@@ -53,6 +53,8 @@ const AdminDashboard = () => {
     fetchAllBookings();
   }, []);
 
+  
+
   const statCards = [
     {
       label: "Total Users",
@@ -122,6 +124,18 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error("Error deleting review:", error);
       alert("Failed to delete review");
+    }
+  };
+
+  const handleStatusChange = async (bookingId: string, newStatus: string) => {
+    try {
+      await apiRequest.patch(`/booking/${bookingId}`, { status: newStatus });
+      setBookings(bookings.map((b: any) => 
+        b._id === bookingId ? { ...b, status: newStatus } : b
+      ));
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Failed to update status");
     }
   };
 
@@ -316,19 +330,27 @@ const AdminDashboard = () => {
                             </div>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
-                            <span
-                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                booking.status === "confirmed"
-                                  ? "bg-green-100 text-green-800"
-                                  : booking.status === "pending"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : booking.status === "cancelled"
-                                      ? "bg-red-100 text-red-800"
-                                      : "bg-gray-100 text-gray-800"
-                              }`}
-                            >
-                              {booking.status || "pending"}
-                            </span>
+                            {booking.status === "pending" ? (
+                              <select
+                                value={booking.status}
+                                onChange={(e) => handleStatusChange(booking._id, e.target.value)}
+                                className="px-3 py-1.5 text-xs font-semibold rounded-lg border-2 cursor-pointer transition-all bg-yellow-50 text-yellow-800 border-yellow-200 hover:bg-yellow-100"
+                              >
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="cancelled">Cancelled</option>
+                              </select>
+                            ) : (
+                              <span
+                                className={`inline-flex px-3 py-1.5 text-xs font-semibold rounded-lg ${
+                                  booking.status === "confirmed"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {booking.status}
+                              </span>
+                            )}
                           </td>
                         </tr>
                       ))}
