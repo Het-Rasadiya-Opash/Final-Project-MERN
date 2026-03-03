@@ -190,9 +190,9 @@ const Profile = () => {
                       </div>
 
                       <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter shadow-sm border ${booking.isPaid ? 'bg-blue-600 text-white border-blue-700' :
-                          booking.status === 'confirmed' ? 'bg-emerald-600 text-white border-emerald-700' :
-                            booking.status === 'pending' ? 'bg-amber-500 text-white border-amber-600' :
-                              'bg-rose-600 text-white border-rose-700'
+                        booking.status === 'confirmed' ? 'bg-emerald-600 text-white border-emerald-700' :
+                          booking.status === 'pending' ? 'bg-amber-500 text-white border-amber-600' :
+                            'bg-rose-600 text-white border-rose-700'
                         }`}>
                         {booking.isPaid ? 'Paid' : booking.status || 'Pending'}
                       </span>
