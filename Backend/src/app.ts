@@ -9,8 +9,8 @@ import listingRoutes from "./routes/listing.route.js";
 import reviewRoutes from "./routes/review.route.js";
 import bookingRoutes from "./routes/booking.route.js";
 import cors from "cors";
-
-const app: Application = express();
+import Stripe from "stripe";
+export const app: Application = express();
 
 app.use(
   cors({
@@ -22,10 +22,45 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+//stripe routes
+app.post("/create-checkout-session", async (req, res) => {
+  try {
+    const { listing } = req.body;
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: listing.title,
+              images: [listing.images],
+            },
+            unit_amount: listing.price * 100,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: "http://localhost:5173/profile",
+      cancel_url: "http://localhost:5173/profile",
+    });
+    res.json({
+      url: session.url,
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.use("/api/user", userRoutes);
 app.use("/api/listing", listingRoutes);
 app.use("/api/review", reviewRoutes);
-app.use('/api/booking',bookingRoutes)
+app.use("/api/booking", bookingRoutes);
+
+
 
 app.use(errorHandler);
 
