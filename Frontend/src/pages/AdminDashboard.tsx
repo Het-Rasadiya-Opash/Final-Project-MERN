@@ -17,10 +17,10 @@ const AdminDashboard = () => {
     totalListings: 0,
     totalReviews: 0,
   });
-  const [listings, setListings] = useState([]);
-  const [reviews, setReviews] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [bookings, setBookings] = useState([]);
+  const [listings, setListings] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const AdminDashboard = () => {
     fetchAllBookings();
   }, []);
 
-  
+
 
   const statCards = [
     {
@@ -88,11 +88,10 @@ const AdminDashboard = () => {
             setActiveTab(tab);
             setIsSidebarOpen(false);
           }}
-          className={`w-full text-left px-4 py-3 mb-2 rounded-lg capitalize transition ${
-            activeTab === tab
-              ? "bg-blue-500 text-white"
-              : "text-gray-700 hover:bg-gray-100"
-          }`}
+          className={`w-full text-left px-4 py-3 mb-2 rounded-lg capitalize transition ${activeTab === tab
+            ? "bg-blue-500 text-white"
+            : "text-gray-700 hover:bg-gray-100"
+            }`}
         >
           {tab}
         </button>
@@ -129,8 +128,11 @@ const AdminDashboard = () => {
 
   const handleStatusChange = async (bookingId: string, newStatus: string) => {
     try {
-      await apiRequest.patch(`/booking/${bookingId}`, { status: newStatus });
-      setBookings(bookings.map((b: any) => 
+      await apiRequest.put(`/booking/status`, {
+        bookingId: bookingId,
+        status: newStatus
+      });
+      setBookings(bookings.map((b) =>
         b._id === bookingId ? { ...b, status: newStatus } : b
       ));
     } catch (error) {
@@ -342,11 +344,10 @@ const AdminDashboard = () => {
                               </select>
                             ) : (
                               <span
-                                className={`inline-flex px-3 py-1.5 text-xs font-semibold rounded-lg ${
-                                  booking.status === "confirmed"
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-red-100 text-red-800"
-                                }`}
+                                className={`inline-flex px-3 py-1.5 text-xs font-semibold rounded-lg ${booking.status === "confirmed"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                                  }`}
                               >
                                 {booking.status}
                               </span>
