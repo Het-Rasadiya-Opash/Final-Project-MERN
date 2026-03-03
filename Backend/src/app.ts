@@ -38,7 +38,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
               name: listing.title,
               images: [listing.images[0]],
             },
-            unit_amount: listing.price ,
+            unit_amount: listing.price * 100,
           },
           quantity: 1,
         },
