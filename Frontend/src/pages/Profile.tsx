@@ -10,6 +10,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState<any>([]);
 
+
   if (!currentUser)
     return <div className="p-8">Please log in to view your profile.</div>;
 
@@ -41,10 +42,26 @@ const Profile = () => {
     fetchUserBooking();
   }, []);
 
-  const handleCheckout = async (listingData: any) => {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const success = params.get('success');
+    const bookingId = params.get('bookingId');
+
+    if (success === 'true' && bookingId) {
+      apiRequest.put('/booking/payment', { bookingId })
+        .then(() => {
+          window.history.replaceState({}, '', '/profile');
+          window.location.reload();
+        })
+        .catch(err => console.error('Payment update failed:', err));
+    }
+  }, []);
+
+  const handleCheckout = async (booking: any) => {
     try {
       const response = await apiRequest.post(`/create-checkout-session`, {
-        listing: listingData
+        listing: booking.listing,
+        bookingId: booking._id
       })
       window.location.href = response.data.url
     } catch (error) {
@@ -141,57 +158,71 @@ const Profile = () => {
           ) : (
             <div className="grid gap-4">
               {bookings.map((booking: any) => (
-                <div key={booking._id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="w-full sm:w-32 h-24 bg-gray-200 rounded-lg overflow-hidden">
+                <div key={booking._id} className="border border-gray-100 rounded-xl p-4 sm:p-5 hover:shadow-md transition-shadow bg-white">
+                  <div className="flex flex-col md:flex-row items-center gap-6">
+
+                    <div className="w-full md:w-32 h-24 bg-gray-100 rounded-lg overflow-hidden shrink-0 shadow-sm">
                       <img
                         src={booking.listing?.images?.[0] || '/placeholder.jpg'}
                         alt={booking.listing?.title || 'Listing'}
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1">{booking.listing?.title || 'Listing'}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{booking.listing?.location}</p>
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+
+                    <div className="flex-1 text-center md:text-left">
+                      <h3 className="text-xl font-bold text-slate-800 mb-0.5">{booking.listing?.title || 'Listing'}</h3>
+                      <p className="text-sm text-gray-400 mb-3">{booking.listing?.location}</p>
+                      <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-4 gap-y-1 text-sm text-slate-600 font-medium">
                         <span>Check-in: {new Date(booking.checkIn).toLocaleDateString("en-GB")}</span>
+                        <span className="hidden md:inline border-l border-gray-300 h-4"></span>
                         <span>Check-out: {new Date(booking.checkOut).toLocaleDateString("en-GB")}</span>
+                        <span className="hidden md:inline border-l border-gray-300 h-4"></span>
                         <span>Guests: {booking.guests}</span>
                       </div>
                     </div>
-                    <div className="flex flex-row sm:flex-col justify-between sm:justify-between items-center sm:items-end sm:text-right">
-                      <div>
-                        <p className="font-bold text-lg text-gray-900">₹{booking.totalPrice?.toLocaleString()}</p>
-                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                          booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-red-100 text-red-800'
-                          }`}>
-                          {booking.status || 'Pending'}
-                        </span>
+
+                    <div className="flex flex-col items-center md:items-end gap-2 md:border-l md:border-gray-100 md:pl-6 w-full md:w-auto">
+                      <div className="text-center md:text-right">
+                        <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Total Price</p>
+                        <p className="text-2xl font-black text-slate-900 leading-none">
+                          ₹{booking.totalPrice?.toLocaleString()}
+                        </p>
                       </div>
-                      {
-                        booking.status === "pending" && (
-                          <div className="flex sm:justify-end sm:mt-2">
-                            <button
-                              onClick={() => handleDeleteBooking(booking._id)}
-                              className="text-red-600 hover:text-red-800 transition-colors"
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
-                          </div>
-                        )
-                      }
-                      {
-                        booking.status === 'confirmed' && (
-                          <div>
-                            <button onClick={() => handleCheckout(booking.listing)}>Pay Now</button>
-                          </div>
-                        )
-                      }
+
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter shadow-sm border ${booking.isPaid ? 'bg-blue-600 text-white border-blue-700' :
+                          booking.status === 'confirmed' ? 'bg-emerald-600 text-white border-emerald-700' :
+                            booking.status === 'pending' ? 'bg-amber-500 text-white border-amber-600' :
+                              'bg-rose-600 text-white border-rose-700'
+                        }`}>
+                        {booking.isPaid ? 'Paid' : booking.status || 'Pending'}
+                      </span>
                     </div>
+
+                    <div className="flex items-center gap-3 w-full md:w-auto">
+                      {booking.status === "pending" && (
+                        <button
+                          onClick={() => handleDeleteBooking(booking._id)}
+                          className="flex-1 md:flex-none p-2.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors border border-transparent hover:border-rose-100"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-5 h-5 mx-auto" />
+                        </button>
+                      )}
+
+                      {booking.status === 'confirmed' && !booking.isPaid && (
+                        <button
+                          onClick={() => handleCheckout(booking)}
+                          className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all shadow-md hover:shadow-lg active:scale-95 uppercase text-sm tracking-wide"
+                        >
+                          Pay Now
+                        </button>
+                      )}
+                    </div>
+
                   </div>
                 </div>
               ))}
+
             </div>
           )}
         </div>

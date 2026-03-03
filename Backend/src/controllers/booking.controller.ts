@@ -105,14 +105,13 @@ export const adminChangeBookingStatus = async (req: Request, res: Response) => {
     const updatedBooking = await bookingModel.findByIdAndUpdate(
       bookingId,
       { status: req.body.status },
-      { returnDocument: "after"  },
+      { returnDocument: "after" },
     );
     return res.status(200).json(updatedBooking);
   } catch (error) {
     return res.status(400).json({ message: "Error updating booking status" });
   }
 };
-
 
 export const deleteBooking = async (req: Request, res: Response) => {
   try {
@@ -132,5 +131,22 @@ export const deleteBooking = async (req: Request, res: Response) => {
     res.status(200).json({ message: "Booking deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting booking" });
+  }
+};
+
+export const updatePaymentStatus = async (req: Request, res: Response) => {
+  try {
+    const { bookingId } = req.body;
+    const booking = await bookingModel.findByIdAndUpdate(
+      bookingId,
+      { isPaid: true },
+      { returnDocument: "after" },
+    );
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+    res.status(200).json({ success: true, booking });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating payment status" });
   }
 };

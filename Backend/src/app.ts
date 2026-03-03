@@ -26,7 +26,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 //stripe routes
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
-    const { listing } = req.body;
+    const { listing, bookingId } = req.body;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -44,8 +44,9 @@ app.post("/api/create-checkout-session", async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: "http://localhost:5173/profile",
+      success_url: `http://localhost:5173/profile?success=true&bookingId=${bookingId}`,
       cancel_url: "http://localhost:5173/profile",
+      metadata: { bookingId },
     });
     res.json({
       url: session.url,

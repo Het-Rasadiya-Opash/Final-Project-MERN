@@ -9,6 +9,7 @@ export interface IBooking {
   totalPrice: number;
   stayDay: number;
   status: "pending" | "confirmed" | "cancelled";
+  isPaid: boolean;
 }
 
 export interface IBookingDocument extends IBooking, Document {}
@@ -48,6 +49,10 @@ const bookingSchema = new mongoose.Schema<IBookingDocument>({
     type: String,
     enum: ["pending", "confirmed", "cancelled"],
     default: "pending",
+  },
+  isPaid: {
+    type: Boolean,
+    default: false,
   },
 });
 
