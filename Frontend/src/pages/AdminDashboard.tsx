@@ -7,6 +7,7 @@ import {
   Menu,
   X,
   Trash2,
+  TicketIcon,
 } from "lucide-react";
 
 const AdminDashboard = () => {
@@ -16,6 +17,7 @@ const AdminDashboard = () => {
     totalUsers: 0,
     totalListings: 0,
     totalReviews: 0,
+    totalBookings: 0,
   });
   const [listings, setListings] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
@@ -31,6 +33,7 @@ const AdminDashboard = () => {
         setListings(data.listings);
         setReviews(data.reviews);
         setUsers(data.users);
+        setBookings(data.bookings);
       } catch (error) {
         console.error("Error fetching stats:", error);
       } finally {
@@ -39,20 +42,6 @@ const AdminDashboard = () => {
     };
     fetchStats();
   }, []);
-
-  useEffect(() => {
-    const fetchAllBookings = async () => {
-      try {
-        const res = await apiRequest.get("/booking/");
-        console.log(res.data)
-        setBookings(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchAllBookings();
-  }, []);
-
 
 
   const statCards = [
@@ -76,6 +65,13 @@ const AdminDashboard = () => {
       icon: MessageSquare,
       color: "text-purple-500",
       bg: "bg-purple-50",
+    },
+    {
+      label: "Total Bookings",
+      value: stats.totalBookings,
+      icon: TicketIcon,
+      color: "text-orange-500",
+      bg: "bg-orange-50",
     },
   ];
 

@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { listingModel } from "../models/listing.model.js";
 import { reviewModel } from "../models/review.model.js";
+import { bookingModel } from "../models/booking.model.js";
 
 export const registerUser = async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
@@ -65,14 +66,21 @@ export const adminAllStates = async (req: Request, res: Response) => {
   const totalUsers = await userModel.countDocuments();
   const totalListings = await listingModel.countDocuments();
   const totalReviews = await reviewModel.countDocuments();
+  const totalBookings = await bookingModel.countDocuments();
 
   const users = await userModel.find();
   const listings = await listingModel.find().populate("owner", "username");
-  const reviews = await reviewModel
-    .find()
-    .populate("owner", "username")
+  const reviews = await reviewModel.find().populate("owner", "username");
+  const bookings = await bookingModel.find().populate("listing customer");
 
-  res
-    .status(200)
-    .json({ totalUsers, totalListings, totalReviews, users, listings, reviews });
+  res.status(200).json({
+    totalUsers,
+    totalListings,
+    totalReviews,
+    totalBookings,
+    users,
+    listings,
+    reviews,
+    bookings
+  });
 };
