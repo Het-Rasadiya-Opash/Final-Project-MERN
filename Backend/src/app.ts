@@ -10,12 +10,11 @@ import reviewRoutes from "./routes/review.route.js";
 import bookingRoutes from "./routes/booking.route.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import cors from "cors";
-import Stripe from "stripe";
 export const app: Application = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.VITE_FRONTEND_BASE_URL,
     credentials: true,
   }),
 );
@@ -23,8 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-
-app.use('/api/payment',paymentRoutes)
+app.use("/api/payment", paymentRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/listing", listingRoutes);
 app.use("/api/review", reviewRoutes);
