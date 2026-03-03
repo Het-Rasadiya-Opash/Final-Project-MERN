@@ -137,6 +137,20 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteBooking = async (bookingId: string) => {
+    if (!confirm("Are you sure you want to delete this booking?")) return;
+    try {
+      await apiRequest.delete(`/booking/delete`, {
+        data: { bookingId }
+      })
+      setBookings(bookings.filter((b) => b._id !== bookingId))
+      setStats((prev) => ({ ...prev, totalBookings: prev.totalBookings - 1 }))
+    } catch (error) {
+      console.error("Error deleting booking:", error);
+      alert("Failed to delete booking")
+    }
+  }
+
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {isSidebarOpen && (
@@ -278,6 +292,9 @@ const AdminDashboard = () => {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                           Status
                         </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          Action
+                        </th>
                       </tr>
                     )}
                   </thead>
@@ -348,6 +365,16 @@ const AdminDashboard = () => {
                                 {booking.status}
                               </span>
                             )}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm">
+                            <button
+                              onClick={() =>
+                                handleDeleteBooking(booking._id)
+                              }
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
                           </td>
                         </tr>
                       ))}
