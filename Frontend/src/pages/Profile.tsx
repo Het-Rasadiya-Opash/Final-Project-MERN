@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import useAuthStore from "../utils/authStore";
 import apiRequest from "../utils/apiRequest";
 import Listing from "../components/Listing";
-import { User, Mail, Calendar, Package, Download } from "lucide-react";
+import { User, Mail, Calendar, Package, Download, Trash2 } from "lucide-react";
 
 const Profile = () => {
   const { currentUser } = useAuthStore();
@@ -42,6 +42,19 @@ const Profile = () => {
     fetchUserBooking();
   }, []);
 
+  const handleDeleteBooking = async (bookingId: string) => {
+    if (!confirm("Are you sure you want to delete this booking?")) return;
+    try {
+      await apiRequest.delete(`/booking/delete`, {
+        data: { bookingId }
+      });
+      setBookings(bookings.filter((b: any) => b._id !== bookingId));
+    } catch (error) {
+      console.error("Error deleting booking:", error);
+      alert("Failed to delete booking");
+    }
+  };
+
   const handleExportCSV = async () => {
     try {
       const response = await apiRequest.get(`/listing/csv-data`, {
@@ -60,6 +73,8 @@ const Profile = () => {
       console.error("Error downloading the CSV file:", error);
     }
   };
+
+
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 py-8 px-4">
@@ -119,8 +134,8 @@ const Profile = () => {
                 <div key={booking._id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
                   <div className="flex flex-col sm:flex-row gap-4">
                     <div className="w-full sm:w-32 h-24 bg-gray-200 rounded-lg overflow-hidden">
-                      <img 
-                        src={booking.listing?.images?.[0] || '/placeholder.jpg'} 
+                      <img
+                        src={booking.listing?.images?.[0] || '/placeholder.jpg'}
                         alt={booking.listing?.title || 'Listing'}
                         className="w-full h-full object-cover"
                       />
@@ -134,15 +149,24 @@ const Profile = () => {
                         <span>Guests: {booking.guests}</span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-lg text-gray-900">₹{booking.totalPrice?.toLocaleString()}</p>
-                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                        booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                        booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {booking.status || 'Pending'}
-                      </span>
+                    <div className="flex flex-row sm:flex-col justify-between sm:justify-between items-center sm:items-end sm:text-right">
+                      <div>
+                        <p className="font-bold text-lg text-gray-900">₹{booking.totalPrice?.toLocaleString()}</p>
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                          booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                          {booking.status || 'Pending'}
+                        </span>
+                      </div>
+                      <div className="flex sm:justify-end sm:mt-2">
+                        <button
+                          onClick={() => handleDeleteBooking(booking._id)}
+                          className="text-red-600 hover:text-red-800 transition-colors"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

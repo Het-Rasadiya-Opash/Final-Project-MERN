@@ -112,3 +112,25 @@ export const adminChangeBookingStatus = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Error updating booking status" });
   }
 };
+
+
+export const deleteBooking = async (req: Request, res: Response) => {
+  try {
+    const { bookingId } = req.body;
+    const userId = (req as any).user._id;
+    const booking = await bookingModel.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+    if (
+      booking.customer.toString() !== userId.toString() &&
+      !(await userModel.findById(userId))?.admin
+    ) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    await bookingModel.findByIdAndDelete(bookingId);
+    res.status(200).json({ message: "Booking deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting booking" });
+  }
+};
