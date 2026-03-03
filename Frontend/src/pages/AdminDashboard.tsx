@@ -379,8 +379,17 @@ const AdminDashboard = () => {
                     {activeTab === "review" &&
                       reviews.map((review: any) => (
                         <tr key={review._id}>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {review.owner?.username || "N/A"}
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                                {review?.owner.username?.charAt(0).toUpperCase() || "U"}
+                              </div>
+                              <div className="ml-3">
+                                <div className="text-sm font-medium text-gray-900">
+                                  {review.owner.username}
+                                </div>
+                              </div>
+                            </div>
                           </td>
                           <td className="px-4 py-4 text-sm text-gray-900">
                             {review.comment}
