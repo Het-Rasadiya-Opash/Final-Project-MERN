@@ -10,6 +10,7 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import AdminRoutes from "./components/AdminRoutes";
 import AdminDashboard from "./pages/AdminDashboard";
 import BookingForm from "./pages/BookingForm";
+import Success from "./pages/Success";
 
 const App = () => {
   return (
@@ -18,6 +19,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
+
+        {/* <Route path='/sucess' element={<Success/>}/> */}
 
         <Route path="/listing/:id" element={<ListingPage />} />
         <Route element={<ProtectedRoutes />}>

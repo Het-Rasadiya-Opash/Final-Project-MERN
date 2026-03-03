@@ -22,23 +22,23 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 //stripe routes
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
     const { listing } = req.body;
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
-            currency: "usd",
+            currency: "inr",
             product_data: {
               name: listing.title,
-              images: [listing.images],
+              images: [listing.images[0]],
             },
-            unit_amount: listing.price * 100,
+            unit_amount: listing.price ,
           },
           quantity: 1,
         },
@@ -59,8 +59,6 @@ app.use("/api/user", userRoutes);
 app.use("/api/listing", listingRoutes);
 app.use("/api/review", reviewRoutes);
 app.use("/api/booking", bookingRoutes);
-
-
 
 app.use(errorHandler);
 

@@ -32,7 +32,6 @@ const Profile = () => {
       try {
         const res = await apiRequest.get(`/booking/user`);
         setBookings(res.data);
-        console.log(res.data);
       } catch (error) {
         console.log("Failed to fetch bookings:", error);
       } finally {
@@ -42,9 +41,12 @@ const Profile = () => {
     fetchUserBooking();
   }, []);
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (listingData: any) => {
     try {
-        // const data=await apiRequest.post()
+      const response = await apiRequest.post(`/create-checkout-session`, {
+        listing: listingData
+      })
+      window.location.href = response.data.url
     } catch (error) {
       console.log(error)
     }
@@ -182,7 +184,7 @@ const Profile = () => {
                       {
                         booking.status === 'confirmed' && (
                           <div>
-                            <button>Pay Now</button>
+                            <button onClick={() => handleCheckout(booking.listing)}>Pay Now</button>
                           </div>
                         )
                       }
