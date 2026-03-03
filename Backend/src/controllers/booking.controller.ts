@@ -3,7 +3,6 @@ import { bookingModel } from "../models/booking.model.js";
 import { listingModel } from "../models/listing.model.js";
 import { userModel } from "../models/user.model.js";
 
-
 export const createBooking = async (req: Request, res: Response) => {
   try {
     const { listingId } = req.params;
@@ -20,25 +19,29 @@ export const createBooking = async (req: Request, res: Response) => {
     }
 
     if (listing.owner.toString() === userId.toString()) {
-      return res.status(400).json({ message: "You cannot book your own listing" });
+      return res
+        .status(400)
+        .json({ message: "You cannot book your own listing" });
     }
 
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkOut);
 
     if (checkInDate >= checkOutDate) {
-      return res.status(400).json({ message: "Check-out must be after check-in" });
+      return res
+        .status(400)
+        .json({ message: "Check-out must be after check-in" });
     }
 
     const overlappingBooking = await bookingModel.findOne({
       listing: listingId,
-      $or: [
-        { checkIn: { $lt: checkOutDate }, checkOut: { $gt: checkInDate } }
-      ],
+      $or: [{ checkIn: { $lt: checkOutDate }, checkOut: { $gt: checkInDate } }],
     });
 
     if (overlappingBooking) {
-      return res.status(400).json({ message: "Listing is not available for these dates" });
+      return res
+        .status(400)
+        .json({ message: "Listing is not available for these dates" });
     }
 
     const diffInTime = checkOutDate.getTime() - checkInDate.getTime();
@@ -60,7 +63,6 @@ export const createBooking = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 export const getAllBookings = async (req: Request, res: Response) => {
   try {
@@ -85,5 +87,28 @@ export const getUserBookings = async (req: Request, res: Response) => {
     res.status(200).json(bookings);
   } catch (error) {
     res.status(500).json({ message: "Error fetching bookings" });
+  }
+};
+
+export const adminChangeBookingStatus = async (req: Request, res: Response) => {
+  const { bookingId } = req.body;
+  try {
+    const booking = await bookingModel.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+    const userId = (req as any).user._id;
+    const user = await userModel.findById(userId);
+    if (!user?.admin) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    const updatedBooking = await bookingModel.findByIdAndUpdate(
+      bookingId,
+      { status: req.body.status },
+      { new: true },
+    );
+    return res.status(200).json(updatedBooking);
+  } catch (error) {
+    return res.status(400).json({ message: "Error updating booking status" });
   }
 };

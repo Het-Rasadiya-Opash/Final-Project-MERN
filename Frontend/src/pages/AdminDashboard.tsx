@@ -44,7 +44,7 @@ const AdminDashboard = () => {
     const fetchAllBookings = async () => {
       try {
         const res = await apiRequest.get("/booking/");
-      
+        console.log(res.data)
         setBookings(res.data);
       } catch (error) {
         console.log(error);
