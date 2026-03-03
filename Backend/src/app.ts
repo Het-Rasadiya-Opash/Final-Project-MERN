@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 //stripe routes
-app.post("/create-checkout-session", async (req, res) => {
+app.post("/api/create-checkout-session", async (req, res) => {
   try {
     const { listing } = req.body;
     const session = await stripe.checkout.sessions.create({

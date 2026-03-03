@@ -42,6 +42,14 @@ const Profile = () => {
     fetchUserBooking();
   }, []);
 
+  const handleCheckout = async () => {
+    try {
+        // const data=await apiRequest.post()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   const handleDeleteBooking = async (bookingId: string) => {
     if (!confirm("Are you sure you want to delete this booking?")) return;
     try {
@@ -168,6 +176,13 @@ const Profile = () => {
                             >
                               <Trash2 className="w-5 h-5" />
                             </button>
+                          </div>
+                        )
+                      }
+                      {
+                        booking.status === 'confirmed' && (
+                          <div>
+                            <button>Pay Now</button>
                           </div>
                         )
                       }
