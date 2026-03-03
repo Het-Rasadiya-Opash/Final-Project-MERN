@@ -105,7 +105,7 @@ export const adminChangeBookingStatus = async (req: Request, res: Response) => {
     const updatedBooking = await bookingModel.findByIdAndUpdate(
       bookingId,
       { status: req.body.status },
-      { new: true },
+      { returnDocument: "after"  },
     );
     return res.status(200).json(updatedBooking);
   } catch (error) {

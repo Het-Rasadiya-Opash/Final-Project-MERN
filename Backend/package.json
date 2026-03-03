@@ -4,8 +4,8 @@
   "main": "app.ts",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "start": "node --watch dist/app.js",
+    "build": "rm -rf dist && tsc",
+    "start": "node dist/app.js",
     "dev": "tsc -w & node --watch dist/app.js"
   },
   "keywords": [],
