@@ -26,7 +26,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 //stripe routes
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
-    const { listing, bookingId } = req.body;
+    const { listing, bookingId, stayDay } = req.body;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -38,7 +38,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
               name: listing.title,
               images: [listing.images[0]],
             },
-            unit_amount: listing.price * 100,
+            unit_amount: listing.price * stayDay * 100,
           },
           quantity: 1,
         },

@@ -61,7 +61,8 @@ const Profile = () => {
     try {
       const response = await apiRequest.post(`/create-checkout-session`, {
         listing: booking.listing,
-        bookingId: booking._id
+        bookingId: booking._id,
+        stayDay: booking.stayDay
       })
       window.location.href = response.data.url
     } catch (error) {
