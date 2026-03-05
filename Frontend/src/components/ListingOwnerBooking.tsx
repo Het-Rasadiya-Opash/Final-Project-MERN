@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import  { useEffect, useState } from 'react'
 import apiRequest from '../utils/apiRequest'
-import { Calendar, User, MapPin, Users } from 'lucide-react'
+import { Calendar, User, MapPin, Users, ChevronDown } from 'lucide-react'
 
 const ListingOwnerBooking = () => {
 
@@ -22,6 +22,25 @@ const ListingOwnerBooking = () => {
         fetchAllBookingByOnwer();
     }, [])
 
+    const handleStatusChange = async (bookingId: string, newStatus: string) => {
+        try {
+            await apiRequest.put('/booking/status', {
+                bookingId,
+                status: newStatus
+            });
+            setListingBooking(prev => 
+                prev.map(booking => 
+                    booking._id === bookingId 
+                        ? { ...booking, status: newStatus } 
+                        : booking
+                )
+            );
+        } catch (error) {
+            console.error('Failed to update status:', error);
+            alert('Failed to update booking status');
+        }
+    };
+
     return (
         <div>
             <h2 className="text-xl font-bold text-gray-900 mb-6">Listing Bookings</h2>
@@ -40,8 +59,7 @@ const ListingOwnerBooking = () => {
                     {listingBooking.map((booking: any) => (
                         <div key={booking._id} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
                             <div className="flex flex-col lg:flex-row gap-6">
-                                {/* Listing Image */}
-                                <div className="w-full lg:w-48 h-48 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                                <div className="w-full lg:w-48 h-48 bg-gray-200 rounded-lg overflow-hidden shrink-0">
                                     <img
                                         src={booking.listing?.images?.[0] || '/placeholder.jpg'}
                                         alt={booking.listing?.title || 'Listing'}
@@ -49,7 +67,6 @@ const ListingOwnerBooking = () => {
                                     />
                                 </div>
 
-                                {/* Listing Details */}
                                 <div className="flex-1">
                                     <div className="flex items-start justify-between mb-4">
                                         <div>
@@ -59,17 +76,45 @@ const ListingOwnerBooking = () => {
                                                 <span className="text-sm">{booking.listing?.location}</span>
                                             </div>
                                         </div>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${
-                                            booking.isPaid ? 'bg-blue-100 text-blue-700 border border-blue-200' :
-                                            booking.status === 'confirmed' ? 'bg-green-100 text-green-700 border border-green-200' :
-                                            booking.status === 'pending' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
-                                            'bg-red-100 text-red-700 border border-red-200'
-                                        }`}>
-                                            {booking.isPaid ? 'Paid' : booking.status}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${
+                                                booking.isPaid ? 'bg-blue-100 text-blue-700 border border-blue-200' :
+                                                booking.status === 'confirmed' ? 'bg-green-100 text-green-700 border border-green-200' :
+                                                booking.status === 'pending' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
+                                                'bg-red-100 text-red-700 border border-red-200'
+                                            }`}>
+                                                {booking.isPaid ? 'Paid' : booking.status}
+                                            </span>
+                                            {!booking.isPaid && (
+                                                <div className="relative group">
+                                                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                                                        <ChevronDown size={18} className="text-gray-600" />
+                                                    </button>
+                                                    <div className="absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                                                        <button
+                                                            onClick={() => handleStatusChange(booking._id, 'confirmed')}
+                                                            className="w-full text-left px-4 py-2 text-sm hover:bg-green-50 text-green-700 rounded-t-lg transition-colors"
+                                                        >
+                                                            Confirmed
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleStatusChange(booking._id, 'pending')}
+                                                            className="w-full text-left px-4 py-2 text-sm hover:bg-yellow-50 text-yellow-700 transition-colors"
+                                                        >
+                                                            Pending
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleStatusChange(booking._id, 'cancelled')}
+                                                            className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-700 rounded-b-lg transition-colors"
+                                                        >
+                                                            Cancelled
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
-                                    {/* Customer Info */}
                                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
                                         <div className="flex items-center gap-2 mb-2">
                                             <User size={18} className="text-gray-600" />
@@ -85,7 +130,6 @@ const ListingOwnerBooking = () => {
                                         </div>
                                     </div>
 
-                                    {/* Booking Details */}
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                         <div>
                                             <p className="text-gray-500 mb-1">Check-in</p>

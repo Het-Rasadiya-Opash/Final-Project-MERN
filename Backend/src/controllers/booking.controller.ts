@@ -93,20 +93,23 @@ export const getUserBookings = async (req: Request, res: Response) => {
 export const adminChangeBookingStatus = async (req: Request, res: Response) => {
   const { bookingId } = req.body;
   try {
-    const booking = await bookingModel.findById(bookingId);
+    const booking = await bookingModel.findById(bookingId).populate('listing');
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
     const userId = (req as any).user._id;
     const user = await userModel.findById(userId);
-    if (!user?.admin) {
+    
+    const isListingOwner = (booking.listing as any).owner.toString() === userId.toString();
+    
+    if (!user?.admin && !isListingOwner) {
       return res.status(403).json({ message: "Access denied" });
     }
     const updatedBooking = await bookingModel.findByIdAndUpdate(
       bookingId,
       { status: req.body.status },
-      { returnDocument: "after" },
-    );
+      { new: true },
+    ).populate('listing customer');
     return res.status(200).json(updatedBooking);
   } catch (error) {
     return res.status(400).json({ message: "Error updating booking status" });
