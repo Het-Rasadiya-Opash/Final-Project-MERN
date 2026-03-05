@@ -150,3 +150,19 @@ export const updatePaymentStatus = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error updating payment status" });
   }
 };
+
+export const ListingOwnerShowBookingDetails = async (
+  req: Request,
+  res: Response,
+) => {
+  const userId = (req as any).user._id;
+  const allListingOfOwner = await listingModel.find({
+    owner: userId,
+  });
+  const listingIds = allListingOfOwner.map((listing) => listing._id);
+  const bookings = await bookingModel
+    .find({ listing: { $in: listingIds } })
+    .populate("customer listing");
+
+  res.status(200).json(bookings);
+};

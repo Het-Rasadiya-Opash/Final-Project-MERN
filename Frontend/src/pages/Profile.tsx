@@ -3,6 +3,7 @@ import useAuthStore from "../utils/authStore";
 import apiRequest from "../utils/apiRequest";
 import Listing from "../components/Listing";
 import { User, Mail, Calendar, Package, Download, Trash2 } from "lucide-react";
+import ListingOwnerBooking from "../components/ListingOwnerBooking";
 
 const Profile = () => {
   const { currentUser } = useAuthStore();
@@ -57,6 +58,7 @@ const Profile = () => {
     }
   }, []);
 
+
   const handleCheckout = async (booking: any) => {
     try {
       const response = await apiRequest.post(`/payment/create-checkout-session`, {
@@ -101,6 +103,8 @@ const Profile = () => {
       console.error("Error downloading the CSV file:", error);
     }
   };
+
+
 
 
 
@@ -228,7 +232,7 @@ const Profile = () => {
           )}
         </div>
 
-        <div className="bg-white shadow-lg rounded-2xl p-6">
+        <div className="bg-white shadow-lg rounded-2xl p-6  mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-4 border-b border-gray-100 gap-4">
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="bg-blue-50 p-2 sm:p-2.5 rounded-xl shadow-sm border border-blue-100 shrink-0">
@@ -283,6 +287,10 @@ const Profile = () => {
               ))}
             </div>
           )}
+        </div>
+
+        <div className="bg-white shadow-lg rounded-2xl p-6">
+          <ListingOwnerBooking/>
         </div>
       </div>
     </div>
