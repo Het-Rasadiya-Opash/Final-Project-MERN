@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Heart, MapPin } from "lucide-react"; // Install lucide-react or use SVG
+import useAuthStore from "../utils/authStore";
 
 interface ListingProps {
   listing: {
@@ -14,6 +15,7 @@ interface ListingProps {
 
 const Listing = ({ listing }: ListingProps) => {
   const navigate = useNavigate();
+  const { currentUser } = useAuthStore()
 
   return (
     <div
@@ -27,14 +29,18 @@ const Listing = ({ listing }: ListingProps) => {
           className="h-full w-full object-cover transition group-hover:scale-105 duration-300"
         />
 
-        <div className="absolute top-3 right-3">
-          <button
-            onClick={(e) => { e.stopPropagation(); }}
-            className="hover:scale-110 transition"
-          >
-            <Heart className="text-white fill-black/20" size={24} />
-          </button>
-        </div>
+        {
+          currentUser && (
+            <div className="absolute top-3 right-3">
+              <button
+                onClick={(e) => { e.stopPropagation(); }}
+                className="hover:scale-110 transition"
+              >
+                <Heart className="text-white fill-black/20" size={24} />
+              </button>
+            </div>
+          )
+        }
 
         <div className="absolute bottom-3 right-3 bg-white/80 backdrop-blur-sm text-[10px] font-bold px-2 py-0.5 rounded-md">
           1 / {listing.images.length}
