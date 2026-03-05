@@ -169,5 +169,7 @@ export const ListingOwnerShowBookingDetails = async (
     .find({ listing: { $in: listingIds } })
     .populate("customer listing");
 
+
   res.status(200).json(bookings);
+
 };
