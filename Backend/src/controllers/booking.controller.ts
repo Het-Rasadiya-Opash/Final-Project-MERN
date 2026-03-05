@@ -120,14 +120,16 @@ export const deleteBooking = async (req: Request, res: Response) => {
   try {
     const { bookingId } = req.body;
     const userId = (req as any).user._id;
-    const booking = await bookingModel.findById(bookingId);
+    const booking = await bookingModel.findById(bookingId).populate('listing');
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
-    if (
-      booking.customer.toString() !== userId.toString() &&
-      !(await userModel.findById(userId))?.admin
-    ) {
+    
+    const isCustomer = booking.customer.toString() === userId.toString();
+    const isAdmin = (await userModel.findById(userId))?.admin;
+    const isListingOwner = (booking.listing as any).owner.toString() === userId.toString();
+    
+    if (!isCustomer && !isAdmin && !isListingOwner) {
       return res.status(403).json({ message: "Access denied" });
     }
     await bookingModel.findByIdAndDelete(bookingId);

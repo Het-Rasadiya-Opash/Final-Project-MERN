@@ -1,6 +1,6 @@
 import  { useEffect, useState } from 'react'
 import apiRequest from '../utils/apiRequest'
-import { Calendar, User, MapPin, Users, ChevronDown } from 'lucide-react'
+import { Calendar, User, MapPin, Users, ChevronDown, Trash2 } from 'lucide-react'
 
 const ListingOwnerBooking = () => {
 
@@ -38,6 +38,19 @@ const ListingOwnerBooking = () => {
         } catch (error) {
             console.error('Failed to update status:', error);
             alert('Failed to update booking status');
+        }
+    };
+
+    const handleDeleteBooking = async (bookingId: string) => {
+        if (!confirm('Are you sure you want to delete this booking?')) return;
+        try {
+            await apiRequest.delete('/booking/delete', {
+                data: { bookingId }
+            });
+            setListingBooking(prev => prev.filter(booking => booking._id !== bookingId));
+        } catch (error) {
+            console.error('Failed to delete booking:', error);
+            alert('Failed to delete booking');
         }
     };
 
@@ -112,6 +125,13 @@ const ListingOwnerBooking = () => {
                                                     </div>
                                                 </div>
                                             )}
+                                            <button
+                                                onClick={() => handleDeleteBooking(booking._id)}
+                                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Delete Booking"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         </div>
                                     </div>
 
