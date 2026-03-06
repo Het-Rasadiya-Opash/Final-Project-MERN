@@ -2,7 +2,10 @@ import type { Request, Response } from "express";
 import { bookingModel } from "../models/booking.model.js";
 import { listingModel } from "../models/listing.model.js";
 import { userModel } from "../models/user.model.js";
-import { sendBookingMail } from "../services/mail.service.js";
+import {
+  sendBookingMail,
+  sendConfirmationBookingMail,
+} from "../services/mail.service.js";
 
 export const createBooking = async (req: Request, res: Response) => {
   try {
@@ -59,7 +62,9 @@ export const createBooking = async (req: Request, res: Response) => {
       totalPrice,
     });
 
-    const populatedBooking = await bookingModel.findById(booking._id).populate("listing customer");
+    const populatedBooking = await bookingModel
+      .findById(booking._id)
+      .populate("listing customer");
     const user = await userModel.findById(userId);
     if (user?.email && populatedBooking) {
       await sendBookingMail(user.email, populatedBooking);
@@ -122,6 +127,12 @@ export const listingOwnerChangeBookingStatus = async (
         { returnDocument: "after" },
       )
       .populate("listing customer");
+    if (updatedBooking?.status === "confirmed") {
+      const user = await userModel.findById(updatedBooking?.customer);
+      if (user?.email && updatedBooking) {
+        await sendConfirmationBookingMail(user.email, updatedBooking);
+      }
+    }
     return res.status(200).json(updatedBooking);
   } catch (error) {
     return res.status(400).json({ message: "Error updating booking status" });
