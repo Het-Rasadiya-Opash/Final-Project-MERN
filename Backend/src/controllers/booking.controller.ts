@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { bookingModel } from "../models/booking.model.js";
 import { listingModel } from "../models/listing.model.js";
 import { userModel } from "../models/user.model.js";
+import { sendBookingMail } from "../services/mail.service.js";
 
 export const createBooking = async (req: Request, res: Response) => {
   try {
@@ -57,6 +58,12 @@ export const createBooking = async (req: Request, res: Response) => {
       stayDay: daysCount,
       totalPrice,
     });
+
+    const populatedBooking = await bookingModel.findById(booking._id).populate("listing customer");
+    const user = await userModel.findById(userId);
+    if (user?.email && populatedBooking) {
+      await sendBookingMail(user.email, populatedBooking);
+    }
 
     return res.status(201).json(booking);
   } catch (error) {
