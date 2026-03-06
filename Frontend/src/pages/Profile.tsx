@@ -1,4 +1,3 @@
-
 import ListingOwnerBooking from "../components/ListingOwnerBooking";
 import UserProfileDetail from "../components/UserProfileDetail";
 import YourBookListing from "../components/YourBookListing";
