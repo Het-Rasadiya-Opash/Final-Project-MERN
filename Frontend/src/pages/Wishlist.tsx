@@ -16,6 +16,7 @@ const Wishlist = () => {
             try {
                 const response = await apiRequest.get(`/like/user?userId=${currentUser._id}`);
                 setWishlist(response.data);
+               
             } catch (error) {
                 console.error('Failed to fetch wishlist:', error);
             } finally {
@@ -24,6 +25,8 @@ const Wishlist = () => {
         }
         fetchWishlist();
     }, [currentUser])
+
+    console.log(wishlist)
 
     if (!currentUser) {
         return (
@@ -58,7 +61,7 @@ const Wishlist = () => {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8">
                         {wishlist.map((item: any) => (
-                            <Listing key={item._id} listing={item.listing} />
+                            item.listing && <Listing key={item._id} listing={item.listing} />
                         ))}
                     </div>
                 )}

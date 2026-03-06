@@ -17,6 +17,9 @@ interface ListingProps {
 }
 
 const Listing = ({ listing, onDelete }: ListingProps) => {
+
+  
+
   const navigate = useNavigate();
   const { currentUser } = useAuthStore();
   const [isLiked, setIsLiked] = useState(false);
@@ -32,7 +35,7 @@ const Listing = ({ listing, onDelete }: ListingProps) => {
       }
     };
     checkLikeStatus();
-  }, [listing._id, currentUser]);
+  }, [listing?._id, currentUser]);
 
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -41,6 +44,7 @@ const Listing = ({ listing, onDelete }: ListingProps) => {
         listingId: listing._id,
         userId: currentUser?._id
       });
+
       setIsLiked(response.data.liked);
     } catch (error) {
       console.log(error);
@@ -54,8 +58,8 @@ const Listing = ({ listing, onDelete }: ListingProps) => {
     >
       <div className="relative aspect-square w-full overflow-hidden rounded-xl">
         <img
-          src={listing.images[0] || "/placeholder-image.jpg"}
-          alt={listing.title}
+          src={listing?.images[0] || "/placeholder-image.jpg"}
+          alt={listing?.title}
           className="h-full w-full object-cover transition group-hover:scale-105 duration-300"
         />
 

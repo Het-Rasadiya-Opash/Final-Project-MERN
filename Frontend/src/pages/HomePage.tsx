@@ -32,6 +32,8 @@ const HomePage = () => {
       const query = category ? `?category=${category}` : "";
       const res = await apiRequest.get(`/listing${query}`);
       setListings(res.data.data);
+            console.log(res.data.data)
+
     } catch (error) {
       console.error("Failed to fetch listings:", error);
     } finally {
