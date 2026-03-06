@@ -3,13 +3,11 @@ import { useEffect, useState } from 'react'
 import apiRequest from '../utils/apiRequest';
 import Listing from './Listing';
 import ConfirmModal from './ConfirmModal';
-import AlertModal from './AlertModal';
 
 const YourListing = () => {
     const [listings, setListings] = useState<any>([]);
     const [loading, setLoading] = useState(true);
     const [confirmDelete, setConfirmDelete] = useState<{ isOpen: boolean, listingId: string }>({ isOpen: false, listingId: '' });
-    const [alert, setAlert] = useState<{ isOpen: boolean, title: string, message: string, type?: 'success' | 'error' | 'warning' }>({ isOpen: false, title: '', message: '' });
 
     useEffect(() => {
         const fetchUserListing = async () => {
@@ -48,10 +46,8 @@ const YourListing = () => {
         try {
             await apiRequest.delete(`/listing/${listingId}`);
             setListings(listings.filter((l: any) => l._id !== listingId));
-            setAlert({ isOpen: true, title: 'Success', message: 'Listing deleted successfully', type: 'success' });
         } catch (error) {
             console.error("Error deleting listing:", error);
-            setAlert({ isOpen: true, title: 'Error', message: 'Failed to delete listing', type: 'error' });
         }
         setConfirmDelete({ isOpen: false, listingId: '' });
     };
@@ -120,14 +116,7 @@ const YourListing = () => {
                 title="Delete Listing"
                 message="Are you sure you want to delete this listing? This action cannot be undone."
             />
-            
-            <AlertModal
-                isOpen={alert.isOpen}
-                onClose={() => setAlert({ ...alert, isOpen: false })}
-                title={alert.title}
-                message={alert.message}
-                type={alert.type}
-            />
+       
 
         </div>
     )

@@ -2,13 +2,11 @@ import  { useEffect, useState } from 'react'
 import apiRequest from '../utils/apiRequest';
 import { Calendar, Trash2 } from 'lucide-react';
 import ConfirmModal from './ConfirmModal';
-import AlertModal from './AlertModal';
 
 const YourBookListing = () => {
     const [loading, setLoading] = useState(true);
     const [bookings, setBookings] = useState<any>([]);
     const [confirmDelete, setConfirmDelete] = useState<{ isOpen: boolean, bookingId: string }>({ isOpen: false, bookingId: '' });
-    const [alert, setAlert] = useState<{ isOpen: boolean, title: string, message: string, type?: 'success' | 'error' | 'warning' }>({ isOpen: false, title: '', message: '' });
 
     useEffect(() => {
         const fetchUserBooking = async () => {
@@ -58,10 +56,8 @@ const YourBookListing = () => {
                 data: { bookingId }
             });
             setBookings(bookings.filter((b: any) => b._id !== bookingId));
-            setAlert({ isOpen: true, title: 'Success', message: 'Booking deleted successfully', type: 'success' });
         } catch (error) {
             console.error("Error deleting booking:", error);
-            setAlert({ isOpen: true, title: 'Error', message: 'Failed to delete booking', type: 'error' });
         }
         setConfirmDelete({ isOpen: false, bookingId: '' });
     };
@@ -166,13 +162,7 @@ const YourBookListing = () => {
                 message="Are you sure you want to delete this booking? This action cannot be undone."
             />
             
-            <AlertModal
-                isOpen={alert.isOpen}
-                onClose={() => setAlert({ ...alert, isOpen: false })}
-                title={alert.title}
-                message={alert.message}
-                type={alert.type}
-            />
+            
         </div>
     )
 }
