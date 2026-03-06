@@ -289,7 +289,7 @@ export const updateListing = async (req: Request, res: Response) => {
     const updatedListing = await listingModel.findByIdAndUpdate(
       listingId,
       updateData,
-      { new: true },
+      { returnDocument: "after" },
     );
 
     if (!imageUrls || imageUrls.length === 0) {
