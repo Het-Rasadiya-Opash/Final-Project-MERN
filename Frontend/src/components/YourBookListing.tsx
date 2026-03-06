@@ -2,7 +2,7 @@ import  { useEffect, useState } from 'react'
 import apiRequest from '../utils/apiRequest';
 import { Calendar, Trash2 } from 'lucide-react';
 
-const YourListing = () => {
+const YourBookListing = () => {
     const [loading, setLoading] = useState(true);
 
     const [bookings, setBookings] = useState<any>([]);
@@ -157,4 +157,4 @@ const YourListing = () => {
     )
 }
 
-export default YourListing
+export default YourBookListing

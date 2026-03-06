@@ -4,7 +4,7 @@ import apiRequest from "../utils/apiRequest";
 import Listing from "../components/Listing";
 import { User, Mail, Calendar, Package, Download } from "lucide-react";
 import ListingOwnerBooking from "../components/ListingOwnerBooking";
-import YourListing from "../components/YourListing";
+import YourBookListing from "../components/YourBookListing";
 
 const Profile = () => {
   const { currentUser } = useAuthStore();
@@ -98,7 +98,7 @@ const Profile = () => {
         </div>
 
         <div className="bg-white shadow-lg rounded-2xl p-6 mb-8">
-          <YourListing />
+          <YourBookListing />
         </div>
 
         <div className="bg-white shadow-lg rounded-2xl p-6  mb-8">
