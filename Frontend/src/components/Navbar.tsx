@@ -35,7 +35,7 @@ const Navbar = () => {
         <div className="flex flex-row items-center justify-between gap-3 md:gap-0 h-20">
 
           <Link to="/" className="flex items-center gap-1 text-blue-500">
-            <div className="hidden lg:block font-bold text-2xl tracking-tight">
+            <div className="font-bold text-xl md:text-2xl tracking-tight">
               listinghouse
             </div>
           </Link>

@@ -11,7 +11,6 @@ const ListingOwnerBooking = () => {
         const fetchAllBookingByOnwer = async () => {
             try {
                 const response = await apiRequest.get('/booking/all');
-                console.log(response.data)
                 setListingBooking(response.data)
             } catch (error) {
                 console.error('Failed to fetch bookings:', error)
