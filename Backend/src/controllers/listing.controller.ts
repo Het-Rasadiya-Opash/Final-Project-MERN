@@ -1,12 +1,14 @@
 import type { Request, Response } from "express";
 import { listingModel } from "../models/listing.model.js";
 import { reviewModel } from "../models/review.model.js";
+import { bookingModel } from "../models/booking.model.js";
 import {
   uploadOnCloudinary,
   deleteFromCloudinary,
 } from "../config/cloudinary.js";
 import { json2csv } from "json-2-csv";
 import { userModel } from "../models/user.model.js";
+import { likeModel } from "../models/like.model.js";
 
 export const createListing = async (req: Request, res: Response) => {
   const { title, description, price, category, location, coordinates } =
@@ -198,6 +200,10 @@ export const userDeleteListing = async (req: Request, res: Response) => {
     if (listing.reviews && listing.reviews.length > 0) {
       await reviewModel.deleteMany({ _id: { $in: listing.reviews } });
     }
+
+    await bookingModel.deleteMany({ listing: listingId } as any);
+    
+    
 
     await listingModel.findByIdAndDelete(listingId);
 
