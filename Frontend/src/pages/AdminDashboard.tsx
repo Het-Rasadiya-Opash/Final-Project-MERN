@@ -95,20 +95,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleStatusChange = async (bookingId: string, newStatus: string) => {
-    try {
-      await apiRequest.put(`/booking/status`, {
-        bookingId: bookingId,
-        status: newStatus
-      });
-      setBookings(bookings.map((b) =>
-        b._id === bookingId ? { ...b, status: newStatus } : b
-      ));
-    } catch (error) {
-      console.error("Error updating status:", error);
-      alert("Failed to update status");
-    }
-  };
+
 
   const handleDeleteBooking = async (bookingId: string) => {
     if (!confirm("Are you sure you want to delete this booking?")) return;
@@ -263,13 +250,12 @@ const AdminDashboard = () => {
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           <span
-                            className={`inline-flex px-3 py-1.5 text-xs font-semibold rounded-lg ${
-                              booking.status === "pending"
+                            className={`inline-flex px-3 py-1.5 text-xs font-semibold rounded-lg ${booking.status === "pending"
                                 ? "bg-yellow-100 text-yellow-800"
                                 : booking.status === "confirmed"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                              }`}
                           >
                             {booking.status}
                           </span>

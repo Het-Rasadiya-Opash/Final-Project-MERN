@@ -70,6 +70,7 @@ const Navbar = () => {
                     <>
                       <Link to="/profile" className="px-4 py-3 hover:bg-neutral-100 font-semibold transition">Profile</Link>
                       <Link to="/create-listing" className="px-4 py-3 hover:bg-neutral-100 transition">Create Listing</Link>
+                      <Link to="/wishlist" className="px-4 py-3 hover:bg-neutral-100 transition">Wishlist</Link>
                       {currentUser.admin && <Link to="/admin" className="px-4 py-3 hover:bg-neutral-100 transition">Dashboard</Link>}
                       <hr className="my-1" />
                       <button onClick={handleLogout} className="text-left px-4 py-3 hover:bg-neutral-100 transition">Logout</button>

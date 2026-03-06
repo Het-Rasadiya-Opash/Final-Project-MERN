@@ -10,11 +10,12 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import AdminRoutes from "./components/AdminRoutes";
 import AdminDashboard from "./pages/AdminDashboard";
 import BookingForm from "./pages/BookingForm";
+import Wishlist from "./pages/Wishlist";
 
 const App = () => {
   return (
     <>
-      <Navbar/>
+      <Navbar />
       <div className="pt-20">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -27,6 +28,7 @@ const App = () => {
             <Route path="/create-listing" element={<CreateListing />} />
             <Route path="/update-listing/:listingId" element={<EditListing />} />
             <Route path="/booking/:listingId" element={<BookingForm />} />
+            <Route path="/wishlist" element={<Wishlist />}/>
           </Route>
           <Route element={<AdminRoutes />}>
             <Route path="/admin" element={<AdminDashboard />} />
