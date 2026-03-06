@@ -1,11 +1,15 @@
-import  { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import apiRequest from '../utils/apiRequest'
 import { Calendar, User, MapPin, Users, ChevronDown, Trash2 } from 'lucide-react'
+import ConfirmModal from './ConfirmModal'
+import AlertModal from './AlertModal'
 
 const ListingOwnerBooking = () => {
 
     const [listingBooking, setListingBooking] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+    const [confirmDelete, setConfirmDelete] = useState<{ isOpen: boolean, bookingId: string }>({ isOpen: false, bookingId: '' })
+    const [alert, setAlert] = useState<{ isOpen: boolean, title: string, message: string, type?: 'success' | 'error' | 'warning' }>({ isOpen: false, title: '', message: '' })
 
     useEffect(() => {
         const fetchAllBookingByOnwer = async () => {
@@ -27,36 +31,38 @@ const ListingOwnerBooking = () => {
                 bookingId,
                 status: newStatus
             });
-            setListingBooking(prev => 
-                prev.map(booking => 
-                    booking._id === bookingId 
-                        ? { ...booking, status: newStatus } 
+            setListingBooking(prev =>
+                prev.map(booking =>
+                    booking._id === bookingId
+                        ? { ...booking, status: newStatus }
                         : booking
                 )
             );
+            setAlert({ isOpen: true, title: 'Success', message: `Booking status updated to ${newStatus}`, type: 'success' });
         } catch (error) {
             console.error('Failed to update status:', error);
-            alert('Failed to update booking status');
+            setAlert({ isOpen: true, title: 'Error', message: 'Failed to update booking status', type: 'error' });
         }
     };
 
     const handleDeleteBooking = async (bookingId: string) => {
-        if (!confirm('Are you sure you want to delete this booking?')) return;
         try {
             await apiRequest.delete('/booking/delete', {
                 data: { bookingId }
             });
             setListingBooking(prev => prev.filter(booking => booking._id !== bookingId));
+            setAlert({ isOpen: true, title: 'Success', message: 'Booking deleted successfully', type: 'success' });
         } catch (error) {
             console.error('Failed to delete booking:', error);
-            alert('Failed to delete booking');
+            setAlert({ isOpen: true, title: 'Error', message: 'Failed to delete booking', type: 'error' });
         }
+        setConfirmDelete({ isOpen: false, bookingId: '' });
     };
 
     return (
         <div>
             <h2 className="text-xl font-bold text-gray-900 mb-6">Listing Bookings</h2>
-            
+
             {loading ? (
                 <div className="flex justify-center py-12">
                     <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
@@ -89,12 +95,11 @@ const ListingOwnerBooking = () => {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${
-                                                booking.isPaid ? 'bg-blue-100 text-blue-700 border border-blue-200' :
+                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${booking.isPaid ? 'bg-blue-100 text-blue-700 border border-blue-200' :
                                                 booking.status === 'confirmed' ? 'bg-green-100 text-green-700 border border-green-200' :
-                                                booking.status === 'pending' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
-                                                'bg-red-100 text-red-700 border border-red-200'
-                                            }`}>
+                                                    booking.status === 'pending' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
+                                                        'bg-red-100 text-red-700 border border-red-200'
+                                                }`}>
                                                 {booking.isPaid ? 'Paid' : booking.status}
                                             </span>
                                             {!booking.isPaid && (
@@ -125,7 +130,7 @@ const ListingOwnerBooking = () => {
                                                 </div>
                                             )}
                                             <button
-                                                onClick={() => handleDeleteBooking(booking._id)}
+                                                onClick={() => setConfirmDelete({ isOpen: true, bookingId: booking._id })}
                                                 className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                 title="Delete Booking"
                                             >
@@ -176,6 +181,22 @@ const ListingOwnerBooking = () => {
                     ))}
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={confirmDelete.isOpen}
+                onClose={() => setConfirmDelete({ isOpen: false, bookingId: '' })}
+                onConfirm={() => handleDeleteBooking(confirmDelete.bookingId)}
+                title="Delete Booking"
+                message="Are you sure you want to delete this booking? This action cannot be undone."
+            />
+
+            <AlertModal
+                isOpen={alert.isOpen}
+                onClose={() => setAlert({ ...alert, isOpen: false })}
+                title={alert.title}
+                message={alert.message}
+                type={alert.type}
+            />
         </div>
     )
 }

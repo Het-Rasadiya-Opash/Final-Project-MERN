@@ -2,10 +2,14 @@ import { Download, Package } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import apiRequest from '../utils/apiRequest';
 import Listing from './Listing';
+import ConfirmModal from './ConfirmModal';
+import AlertModal from './AlertModal';
 
 const YourListing = () => {
     const [listings, setListings] = useState<any>([]);
     const [loading, setLoading] = useState(true);
+    const [confirmDelete, setConfirmDelete] = useState<{ isOpen: boolean, listingId: string }>({ isOpen: false, listingId: '' });
+    const [alert, setAlert] = useState<{ isOpen: boolean, title: string, message: string, type?: 'success' | 'error' | 'warning' }>({ isOpen: false, title: '', message: '' });
 
     useEffect(() => {
         const fetchUserListing = async () => {
@@ -41,14 +45,15 @@ const YourListing = () => {
     };
 
     const handleDeleteListing = async (listingId: string) => {
-        if (!confirm("Are you sure you want to delete this listing?")) return;
         try {
             await apiRequest.delete(`/listing/${listingId}`);
             setListings(listings.filter((l: any) => l._id !== listingId));
+            setAlert({ isOpen: true, title: 'Success', message: 'Listing deleted successfully', type: 'success' });
         } catch (error) {
             console.error("Error deleting listing:", error);
-            alert("Failed to delete listing");
+            setAlert({ isOpen: true, title: 'Error', message: 'Failed to delete listing', type: 'error' });
         }
+        setConfirmDelete({ isOpen: false, listingId: '' });
     };
 
     return (
@@ -103,10 +108,27 @@ const YourListing = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {listings.map((listing: any) => (
-                        <Listing key={listing._id} listing={listing} onDelete={handleDeleteListing} />
+                        <Listing key={listing._id} listing={listing} onDelete={(id) => setConfirmDelete({ isOpen: true, listingId: id })} />
                     ))}
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={confirmDelete.isOpen}
+                onClose={() => setConfirmDelete({ isOpen: false, listingId: '' })}
+                onConfirm={() => handleDeleteListing(confirmDelete.listingId)}
+                title="Delete Listing"
+                message="Are you sure you want to delete this listing? This action cannot be undone."
+            />
+            
+            <AlertModal
+                isOpen={alert.isOpen}
+                onClose={() => setAlert({ ...alert, isOpen: false })}
+                title={alert.title}
+                message={alert.message}
+                type={alert.type}
+            />
+
         </div>
     )
 }
