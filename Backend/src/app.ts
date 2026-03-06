@@ -9,6 +9,7 @@ import listingRoutes from "./routes/listing.route.js";
 import reviewRoutes from "./routes/review.route.js";
 import bookingRoutes from "./routes/booking.route.js";
 import paymentRoutes from "./routes/payment.routes.js";
+import likeRoutes from "./routes/like.route.js";
 import cors from "cors";
 export const app: Application = express();
 
@@ -27,6 +28,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/listing", listingRoutes);
 app.use("/api/review", reviewRoutes);
 app.use("/api/booking", bookingRoutes);
+app.use("/api/like", likeRoutes);
 
 app.use(errorHandler);
 

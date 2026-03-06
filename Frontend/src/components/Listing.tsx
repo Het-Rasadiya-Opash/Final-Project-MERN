@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { Heart, MapPin } from "lucide-react"; // Install lucide-react or use SVG
+import { Heart, MapPin } from "lucide-react";
 import useAuthStore from "../utils/authStore";
+import apiRequest from "../utils/apiRequest";
+import { useState, useEffect } from "react";
 
 interface ListingProps {
   listing: {
@@ -15,7 +17,34 @@ interface ListingProps {
 
 const Listing = ({ listing }: ListingProps) => {
   const navigate = useNavigate();
-  const { currentUser } = useAuthStore()
+  const { currentUser } = useAuthStore();
+  const [isLiked, setIsLiked] = useState(false);
+
+  useEffect(() => {
+    const checkLikeStatus = async () => {
+      if (!currentUser) return;
+      try {
+        const response = await apiRequest.get(`/like/check?listingId=${listing._id}&userId=${currentUser._id}`);
+        setIsLiked(response.data.liked);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    checkLikeStatus();
+  }, [listing._id, currentUser]);
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const response = await apiRequest.post('/like', {
+        listingId: listing._id,
+        userId: currentUser?._id
+      });
+      setIsLiked(response.data.liked);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div
@@ -33,10 +62,13 @@ const Listing = ({ listing }: ListingProps) => {
           currentUser && (
             <div className="absolute top-3 right-3">
               <button
-                onClick={(e) => { e.stopPropagation(); }}
+                onClick={handleLike}
                 className="hover:scale-110 transition"
               >
-                <Heart className="text-white fill-black/20" size={24} />
+                <Heart 
+                  className={isLiked ? "text-red-500 fill-red-500" : "text-white fill-black/20"} 
+                  size={24} 
+                />
               </button>
             </div>
           )
