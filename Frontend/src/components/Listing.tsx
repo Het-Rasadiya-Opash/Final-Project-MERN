@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Heart, MapPin } from "lucide-react";
+import { Heart, MapPin, Trash2 } from "lucide-react";
 import useAuthStore from "../utils/authStore";
 import apiRequest from "../utils/apiRequest";
 import { useState, useEffect } from "react";
@@ -13,9 +13,10 @@ interface ListingProps {
     location?: string;
     owner?: { _id: string; username?: string; email?: string };
   };
+  onDelete?: (listingId: string) => void;
 }
 
-const Listing = ({ listing }: ListingProps) => {
+const Listing = ({ listing, onDelete }: ListingProps) => {
   const navigate = useNavigate();
   const { currentUser } = useAuthStore();
   const [isLiked, setIsLiked] = useState(false);
@@ -80,11 +81,23 @@ const Listing = ({ listing }: ListingProps) => {
       </div>
 
       <div className="flex flex-col pt-1">
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-center">
           <h3 className="font-semibold text-[15px] text-gray-900 line-clamp-1 flex items-center gap-1">
             <MapPin size={16} className="text-gray-600" />
             {listing.location || "Location unlisted"}
           </h3>
+          {onDelete && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(listing._id);
+              }}
+              className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95 shadow-sm hover:shadow-md border border-red-100 hover:border-red-200"
+              title="Delete Listing"
+            >
+              <Trash2 size={18} />
+            </button>
+          )}
         </div>
 
         <p className="text-gray-500 font-light text-sm line-clamp-1">

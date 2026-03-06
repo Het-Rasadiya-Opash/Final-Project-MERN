@@ -104,6 +104,17 @@ const Profile = () => {
     }
   };
 
+  const handleDeleteListing = async (listingId: string) => {
+    if (!confirm("Are you sure you want to delete this listing?")) return;
+    try {
+      await apiRequest.delete(`/listing/${listingId}`);
+      setListings(listings.filter((l: any) => l._id !== listingId));
+    } catch (error) {
+      console.error("Error deleting listing:", error);
+      alert("Failed to delete listing");
+    }
+  };
+
 
 
 
@@ -283,7 +294,7 @@ const Profile = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {listings.map((listing: any) => (
-                <Listing key={listing._id} listing={listing} />
+                <Listing key={listing._id} listing={listing} onDelete={handleDeleteListing} />
               ))}
             </div>
           )}
