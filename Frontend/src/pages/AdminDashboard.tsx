@@ -170,6 +170,7 @@ const AdminDashboard = () => {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">City</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Owner</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
                       </>
                     )}
@@ -251,10 +252,10 @@ const AdminDashboard = () => {
                         <td className="px-4 py-4 whitespace-nowrap">
                           <span
                             className={`inline-flex px-3 py-1.5 text-xs font-semibold rounded-lg ${booking.status === "pending"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : booking.status === "confirmed"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : booking.status === "confirmed"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
                               }`}
                           >
                             {booking.status}
@@ -286,6 +287,9 @@ const AdminDashboard = () => {
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                           {listing.category}
+                        </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {listing.owner.username}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm">
                           <button
