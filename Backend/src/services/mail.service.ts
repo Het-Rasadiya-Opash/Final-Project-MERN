@@ -189,3 +189,5 @@ export const sendConfirmationBookingMail = async (to: string, booking: any) => {
   `;
   await sendEmail(to, subject, html);
 };
+
+
