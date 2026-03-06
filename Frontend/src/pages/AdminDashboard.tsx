@@ -262,26 +262,17 @@ const AdminDashboard = () => {
                           </div>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          {booking.status === "pending" ? (
-                            <select
-                              value={booking.status}
-                              onChange={(e) => handleStatusChange(booking._id, e.target.value)}
-                              className="px-3 py-1.5 text-xs font-semibold rounded-lg border-2 cursor-pointer transition-all bg-yellow-50 text-yellow-800 border-yellow-200 hover:bg-yellow-100"
-                            >
-                              <option value="pending">Pending</option>
-                              <option value="confirmed">Confirmed</option>
-                              <option value="cancelled">Cancelled</option>
-                            </select>
-                          ) : (
-                            <span
-                              className={`inline-flex px-3 py-1.5 text-xs font-semibold rounded-lg ${booking.status === "confirmed"
+                          <span
+                            className={`inline-flex px-3 py-1.5 text-xs font-semibold rounded-lg ${
+                              booking.status === "pending"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : booking.status === "confirmed"
                                 ? "bg-green-100 text-green-800"
                                 : "bg-red-100 text-red-800"
-                                }`}
-                            >
-                              {booking.status}
-                            </span>
-                          )}
+                            }`}
+                          >
+                            {booking.status}
+                          </span>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm">
                           <button

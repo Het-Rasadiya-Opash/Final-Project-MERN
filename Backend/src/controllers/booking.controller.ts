@@ -90,26 +90,31 @@ export const getUserBookings = async (req: Request, res: Response) => {
   }
 };
 
-export const adminChangeBookingStatus = async (req: Request, res: Response) => {
+export const listingOwnerChangeBookingStatus = async (
+  req: Request,
+  res: Response,
+) => {
   const { bookingId } = req.body;
   try {
-    const booking = await bookingModel.findById(bookingId).populate('listing');
+    const booking = await bookingModel.findById(bookingId).populate("listing");
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
     const userId = (req as any).user._id;
-    const user = await userModel.findById(userId);
-    
-    const isListingOwner = (booking.listing as any).owner.toString() === userId.toString();
-    
-    if (!user?.admin && !isListingOwner) {
+
+    const isListingOwner =
+      (booking.listing as any).owner.toString() === userId.toString();
+
+    if (!isListingOwner) {
       return res.status(403).json({ message: "Access denied" });
     }
-    const updatedBooking = await bookingModel.findByIdAndUpdate(
-      bookingId,
-      { status: req.body.status },
-      { new: true },
-    ).populate('listing customer');
+    const updatedBooking = await bookingModel
+      .findByIdAndUpdate(
+        bookingId,
+        { status: req.body.status },
+        { returnDocument: "after" },
+      )
+      .populate("listing customer");
     return res.status(200).json(updatedBooking);
   } catch (error) {
     return res.status(400).json({ message: "Error updating booking status" });
@@ -120,15 +125,16 @@ export const deleteBooking = async (req: Request, res: Response) => {
   try {
     const { bookingId } = req.body;
     const userId = (req as any).user._id;
-    const booking = await bookingModel.findById(bookingId).populate('listing');
+    const booking = await bookingModel.findById(bookingId).populate("listing");
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
-    
+
     const isCustomer = booking.customer.toString() === userId.toString();
     const isAdmin = (await userModel.findById(userId))?.admin;
-    const isListingOwner = (booking.listing as any).owner.toString() === userId.toString();
-    
+    const isListingOwner =
+      (booking.listing as any).owner.toString() === userId.toString();
+
     if (!isCustomer && !isAdmin && !isListingOwner) {
       return res.status(403).json({ message: "Access denied" });
     }
@@ -169,7 +175,5 @@ export const ListingOwnerShowBookingDetails = async (
     .find({ listing: { $in: listingIds } })
     .populate("customer listing");
 
-
   res.status(200).json(bookings);
-
 };
