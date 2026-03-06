@@ -26,7 +26,6 @@ const Wishlist = () => {
         fetchWishlist();
     }, [currentUser])
 
-    console.log(wishlist)
 
     if (!currentUser) {
         return (
