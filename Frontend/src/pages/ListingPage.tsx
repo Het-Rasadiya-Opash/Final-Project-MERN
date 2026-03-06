@@ -2,16 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import apiRequest from "../utils/apiRequest";
 import useAuthStore from "../utils/authStore";
-import ReviewForm from "../components/ReviewForm";
-import Review from "../components/Review";
 import Map from "../components/Map";
+import ReviewContainer from "../components/ReviewContainer";
 
 const ListingPage = () => {
   const { id } = useParams();
   const [listing, setListing] = useState<any>(null);
   const [currentImage, setCurrentImage] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [reviewRefresh, setReviewRefresh] = useState(0);
   const { currentUser } = useAuthStore();
   const navigate = useNavigate();
 
@@ -77,8 +75,8 @@ const ListingPage = () => {
                   alt={`${listing.title} ${idx + 1}`}
                   onClick={() => setCurrentImage(idx)}
                   className={`h-20 w-28 object-cover rounded-lg cursor-pointer transition-all duration-200 ${currentImage === idx
-                      ? "ring-2 ring-blue-500"
-                      : "opacity-70 hover:opacity-100"
+                    ? "ring-2 ring-blue-500"
+                    : "opacity-70 hover:opacity-100"
                     }`}
                 />
               ))}
@@ -193,37 +191,7 @@ const ListingPage = () => {
         </div>
       )}
 
-      <div className="mt-16 pt-10 border-t">
-        <h2 className="text-2xl font-bold mb-8">
-          Reviews
-        </h2>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {currentUser && (
-            <div className="bg-white border rounded-xl p-6 shadow-sm">
-              <h3 className="text-lg font-semibold mb-4">
-                Leave a Review
-              </h3>
-              <ReviewForm
-                listingId={id}
-                onReviewAdded={() =>
-                  setReviewRefresh((prev) => prev + 1)
-                }
-              />
-            </div>
-          )}
-
-          <div className="bg-white border rounded-xl p-6 shadow-sm">
-            <h3 className="text-lg font-semibold mb-4">
-              All Reviews
-            </h3>
-            <Review
-              listingId={id}
-              refreshTrigger={reviewRefresh}
-            />
-          </div>
-        </div>
-      </div>
+      <ReviewContainer id={id!} />
     </div>
   );
 };

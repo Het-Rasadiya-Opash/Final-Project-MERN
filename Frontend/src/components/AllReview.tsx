@@ -18,7 +18,7 @@ interface ReviewData {
   createdAt: string;
 }
 
-const Review = ({ listingId, refreshTrigger }: ReviewProps) => {
+const AllReview = ({ listingId, refreshTrigger }: ReviewProps) => {
   const [reviews, setReviews] = useState<ReviewData[]>([]);
   const { currentUser } = useAuthStore();
 
@@ -106,4 +106,4 @@ const Review = ({ listingId, refreshTrigger }: ReviewProps) => {
   );
 };
 
-export default Review;
+export default AllReview;
