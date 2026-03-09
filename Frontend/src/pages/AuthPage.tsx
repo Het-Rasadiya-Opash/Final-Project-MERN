@@ -44,7 +44,6 @@ const AuthPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12 pt-24">
       <div className="w-full max-w-142 bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
         
-        {/* Header */}
         <div className="border-b border-gray-200 px-6 py-5 text-center font-bold text-gray-900 text-base">
           {isRegister ? "Sign up" : "Log in"}
         </div>
