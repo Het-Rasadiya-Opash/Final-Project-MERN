@@ -202,6 +202,7 @@ export const userDeleteListing = async (req: Request, res: Response) => {
     }
 
     await bookingModel.deleteMany({ listing: listingId } as any);
+    await likeModel.deleteMany({ listing: listingId } as any);
     
     
 
