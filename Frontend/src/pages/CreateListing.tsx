@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiRequest from "../utils/apiRequest";
-import { Loader2, MapPin } from "lucide-react";
+import { Loader2, MapPin, X } from "lucide-react";
 
 const categories = [
   "rooms",
@@ -94,206 +94,185 @@ const CreateListing = () => {
     );
   };
 
+  const inputStyles = "w-full px-4 py-3.5 rounded-xl border border-gray-400 focus:ring-2 focus:ring-black focus:border-black outline-none transition duration-200 text-gray-900";
+  const labelStyles = "block text-sm font-semibold text-gray-900 mb-2";
+
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-10">
+    <div className="min-h-screen bg-white py-12 px-4">
+      <div className="max-w-3xl mx-auto">
 
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Create New Listing
+          Tell us about your place
         </h1>
 
         {error && (
-          <div className="mb-6 p-4 text-sm bg-red-50 text-red-600 border border-red-200 rounded-xl">
+          <div className="mb-6 p-4 text-sm bg-red-50 text-red-600 border border-red-200 rounded-xl font-medium">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
 
-          {imagePreviews.length > 0 && (
+          <div className="border border-gray-200 p-6 rounded-2xl shadow-sm">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Photos</h2>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Image Preview
-              </label>
-              <div className="flex flex-wrap gap-4">
-                {imagePreviews.map((preview, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={preview}
-                      alt="preview"
-                      className="w-28 h-28 object-cover rounded-xl border border-gray-200 shadow-sm"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveNewImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center shadow hover:bg-red-600 transition"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
+              <input
+                type="file"
+                multiple
+                onChange={handleImageChange}
+                accept="image/*"
+                className="w-full text-sm border border-gray-400 rounded-xl px-4 py-3 
+                file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 
+                file:text-sm file:font-medium file:bg-gray-100 file:text-gray-900 
+                hover:file:bg-gray-200 transition cursor-pointer"
+                required
+              />
             </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Upload Images *
-            </label>
-            <input
-              type="file"
-              multiple
-              onChange={handleImageChange}
-              accept="image/*"
-              className="w-full text-sm border border-gray-300 rounded-xl px-4 py-3 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 transition"
-              required
-            />
+            
+            {imagePreviews.length > 0 && (
+              <div className="mt-6">
+                <div className="flex flex-wrap gap-4">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={preview}
+                        alt="preview"
+                        className="w-32 h-32 object-cover rounded-xl border border-gray-200 shadow-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveNewImage(index)}
+                        className="absolute -top-3 -right-3 bg-white border border-gray-300 text-gray-900 hover:text-red-500 w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Title *
-            </label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) =>
-                setFormData({ ...formData, title: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              required
-            />
+          <div className="border border-gray-200 p-6 rounded-2xl shadow-sm space-y-6">
+             <h2 className="text-xl font-semibold text-gray-900">Listing basics</h2>
+             
+             <div>
+                <label className={labelStyles}>Title *</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  className={inputStyles}
+                  placeholder="E.g. Cozy cabin with a view"
+                  required
+                />
+             </div>
+
+             <div>
+                <label className={labelStyles}>Description</label>
+                <textarea
+                  rows={4}
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className={`${inputStyles} resize-none`}
+                  placeholder="Describe what makes your place special..."
+                />
+             </div>
+
+             <div>
+                <label className={labelStyles}>Price per Night (₹) *</label>
+                <input
+                  type="number"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  className={inputStyles}
+                  placeholder="0"
+                  required
+                />
+             </div>
+
+             <div>
+                <label className={labelStyles}>General Location *</label>
+                <input
+                  type="text"
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  className={inputStyles}
+                  placeholder="City, Region, or Neighborhood"
+                  required
+                />
+             </div>
+             
+             <div>
+                <label className={labelStyles}>Property Category *</label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className={`${inputStyles} bg-white`}
+                  required
+                >
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat} className="capitalize">{cat}</option>
+                  ))}
+                </select>
+             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Description
-            </label>
-            <textarea
-              rows={4}
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Price per Night *
-            </label>
-            <input
-              type="number"
-              value={formData.price}
-              onChange={(e) =>
-                setFormData({ ...formData, price: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Location *
-            </label>
-            <input
-              type="text"
-              value={formData.location}
-              onChange={(e) =>
-                setFormData({ ...formData, location: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              required
-            />
-          </div>
-
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <label className="text-sm font-semibold text-gray-700">
-                Coordinates *
-              </label>
-
-              <button
-                type="button"
-                onClick={getCurrentLocation}
-                disabled={gettingLocation}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium 
-             bg-blue-50 text-blue-600 rounded-xl 
-             hover:bg-blue-100 
-             disabled:opacity-60 disabled:cursor-not-allowed 
-             transition duration-200"
-              >
-                {gettingLocation ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Getting location...
-                  </>
-                ) : (
-                  <>
-                    <MapPin className="w-4 h-4" />
-                    Use Current Location
-                  </>
-                )}
-              </button>
+          <div className="border border-gray-200 p-6 rounded-2xl shadow-sm space-y-6">
+            <h2 className="text-xl font-semibold text-gray-900">Map location</h2>
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+               <p className="text-sm text-gray-600 font-medium">Pinpoint exactly where your property is located.</p>
+               <button
+                 type="button"
+                 onClick={getCurrentLocation}
+                 disabled={gettingLocation}
+                 className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold 
+                 bg-white text-gray-900 border border-gray-900 rounded-xl 
+                 hover:bg-gray-100 disabled:opacity-50 transition duration-200 whitespace-nowrap"
+               >
+                 {gettingLocation ? (
+                   <><Loader2 className="w-4 h-4 animate-spin" /> Locating...</>
+                 ) : (
+                   <><MapPin className="w-4 h-4" /> Use Current Location</>
+                 )}
+               </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input
-                type="number"
-                step="any"
-                placeholder="Longitude"
-                value={formData.longitude}
-                onChange={(e) =>
-                  setFormData({ ...formData, longitude: e.target.value })
-                }
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                required
-              />
-              <input
-                type="number"
-                step="any"
-                placeholder="Latitude"
-                value={formData.latitude}
-                onChange={(e) =>
-                  setFormData({ ...formData, latitude: e.target.value })
-                }
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                required
-              />
+               <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Longitude *</label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={formData.longitude}
+                    onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+                    className={inputStyles}
+                    required
+                  />
+               </div>
+               <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Latitude *</label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={formData.latitude}
+                    onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                    className={inputStyles}
+                    required
+                  />
+               </div>
             </div>
           </div>
 
-          {/* Category */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Category *
-            </label>
-            <select
-              value={formData.category}
-              onChange={(e) =>
-                setFormData({ ...formData, category: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              required
-            >
-              {categories.map((cat) => (
-                <option key={cat} value={cat} className="capitalize">
-                  {cat}
-                </option>
-              ))}
-            </select>
+          <div className="pt-4 border-t border-gray-200 flex justify-end">
+             <button
+               type="submit"
+               disabled={loading}
+               className="bg-primary hover:bg-primary-dark disabled:bg-gray-400 text-white px-10 py-3.5 rounded-xl font-semibold transition duration-200 text-lg shadow-sm"
+             >
+               {loading ? "Saving..." : "Create your listing"}
+             </button>
           </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-xl font-semibold transition duration-200 shadow-md hover:shadow-lg"
-          >
-            {loading ? "Creating Listing..." : "Create Listing"}
-          </button>
         </form>
       </div>
     </div>

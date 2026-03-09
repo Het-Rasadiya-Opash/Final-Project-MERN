@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import apiRequest from "../utils/apiRequest";
 
@@ -23,10 +24,7 @@ const ReviewForm = ({ listingId, onReviewAdded }: ReviewFormProps) => {
     e.preventDefault();
     setError("");
     try {
-       await apiRequest.post(
-        `/review/create/${listingId}`,
-        formData,
-      )
+      await apiRequest.post(`/review/create/${listingId}`, formData);
       setFormData({ comment: "", rating: "" });
       onReviewAdded?.();
     } catch (err: any) {
@@ -37,15 +35,15 @@ const ReviewForm = ({ listingId, onReviewAdded }: ReviewFormProps) => {
   return (
     <div className="bg-transparent">
       {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+        <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg text-sm font-medium border border-red-100">
           {error}
         </div>
       )}
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label
             htmlFor="comment"
-            className="block text-sm font-semibold text-gray-700 mb-2"
+            className="block text-[15px] font-medium text-gray-800 mb-2"
           >
             Comment
           </label>
@@ -55,7 +53,7 @@ const ReviewForm = ({ listingId, onReviewAdded }: ReviewFormProps) => {
             value={formData.comment}
             onChange={handleChange}
             rows={4}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition text-gray-700"
             placeholder="Share your experience..."
             required
           />
@@ -63,7 +61,7 @@ const ReviewForm = ({ listingId, onReviewAdded }: ReviewFormProps) => {
         <div>
           <label
             htmlFor="rating"
-            className="block text-sm font-semibold text-gray-700 mb-2"
+            className="block text-[15px] font-medium text-gray-800 mb-2"
           >
             Rating (1-5)
           </label>
@@ -75,15 +73,14 @@ const ReviewForm = ({ listingId, onReviewAdded }: ReviewFormProps) => {
             max="5"
             value={formData.rating}
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition text-gray-700"
             placeholder="Enter rating (1-5)"
             required
           />
         </div>
         <button
           type="submit"
-
-          className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 font-semibold"
+          className="w-full bg-primary text-white py-3.5 px-4 rounded-xl hover:bg-primary-dark transition duration-200 font-semibold active:scale-[0.98]"
         >
           Submit Review
         </button>

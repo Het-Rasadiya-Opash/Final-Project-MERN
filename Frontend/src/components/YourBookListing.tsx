@@ -1,170 +1,218 @@
-import  { useEffect, useState } from 'react'
-import apiRequest from '../utils/apiRequest';
-import { Calendar, Trash2 } from 'lucide-react';
-import ConfirmModal from './ConfirmModal';
+import { useEffect, useState } from "react";
+import apiRequest from "../utils/apiRequest";
+import { Calendar } from "lucide-react";
+import ConfirmModal from "./ConfirmModal";
 
 const YourBookListing = () => {
-    const [loading, setLoading] = useState(true);
-    const [bookings, setBookings] = useState<any>([]);
-    const [confirmDelete, setConfirmDelete] = useState<{ isOpen: boolean, bookingId: string }>({ isOpen: false, bookingId: '' });
+  const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState<any>([]);
+  const [confirmDelete, setConfirmDelete] = useState<{
+    isOpen: boolean;
+    bookingId: string;
+  }>({ isOpen: false, bookingId: "" });
 
-    useEffect(() => {
-        const fetchUserBooking = async () => {
-            try {
-                const res = await apiRequest.get(`/booking/user`);
-                setBookings(res.data);
-            } catch (error) {
-                console.log("Failed to fetch bookings:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchUserBooking();
-    }, []);
-
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const success = params.get('success');
-        const bookingId = params.get('bookingId');
-
-        if (success === 'true' && bookingId) {
-            apiRequest.put('/booking/payment', { bookingId })
-                .then(() => {
-                    window.history.replaceState({}, '', '/profile');
-                    window.location.reload();
-                })
-                .catch(err => console.error('Payment update failed:', err));
-        }
-    }, []);
-
-    const handleCheckout = async (booking: any) => {
-        try {
-            const response = await apiRequest.post(`/payment/create-checkout-session`, {
-                listing: booking.listing,
-                bookingId: booking._id,
-                stayDay: booking.stayDay
-            })
-            window.location.href = response.data.url
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    const handleDeleteBooking = async (bookingId: string) => {
-        try {
-            await apiRequest.delete(`/booking/delete`, {
-                data: { bookingId }
-            });
-            setBookings(bookings.filter((b: any) => b._id !== bookingId));
-        } catch (error) {
-            console.error("Error deleting booking:", error);
-        }
-        setConfirmDelete({ isOpen: false, bookingId: '' });
+  useEffect(() => {
+    const fetchUserBooking = async () => {
+      try {
+        const res = await apiRequest.get(`/booking/user`);
+        setBookings(res.data);
+      } catch (error) {
+        console.log("Failed to fetch bookings:", error);
+      } finally {
+        setLoading(false);
+      }
     };
+    fetchUserBooking();
+  }, []);
 
-    return (
-        <div>
-            <div className="flex items-center gap-3 mb-6">
-                <div className="bg-blue-50 p-2.5 rounded-xl shadow-sm border border-blue-100">
-                    <Calendar size={20} className="text-blue-600" />
-                </div>
-                <div>
-                    <h2 className="text-xl font-bold text-gray-900">Your Bookings</h2>
-                    <p className="text-sm text-gray-500">Total: {bookings.length} {bookings.length === 1 ? 'Booking' : 'Bookings'}</p>
-                </div>
-            </div>
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const success = params.get("success");
+    const bookingId = params.get("bookingId");
 
-            {loading ? (
-                <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                </div>
-            ) : bookings.length === 0 ? (
-                <div className="text-center py-8">
-                    <Calendar size={48} className="mx-auto text-gray-300 mb-3" />
-                    <p className="text-gray-500">No bookings yet</p>
-                </div>
-            ) : (
-                <div className="grid gap-4">
-                    {bookings.map((booking: any) => (
-                        <div key={booking._id} className="border border-gray-100 rounded-xl p-4 sm:p-5 hover:shadow-md transition-shadow bg-white">
-                            <div className="flex flex-col md:flex-row items-center gap-6">
+    if (success === "true" && bookingId) {
+      apiRequest
+        .put("/booking/payment", { bookingId })
+        .then(() => {
+          window.history.replaceState({}, "", "/profile");
+          window.location.reload();
+        })
+        .catch((err) => console.error("Payment update failed:", err));
+    }
+  }, []);
 
-                                <div className="w-full md:w-32 h-24 bg-gray-100 rounded-lg overflow-hidden shrink-0 shadow-sm">
-                                    <img
-                                        src={booking.listing?.images?.[0] || '/placeholder.jpg'}
-                                        alt={booking.listing?.title || 'Listing'}
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
+  const handleCheckout = async (booking: any) => {
+    try {
+      const response = await apiRequest.post(
+        `/payment/create-checkout-session`,
+        {
+          listing: booking.listing,
+          bookingId: booking._id,
+          stayDay: booking.stayDay,
+        },
+      );
+      window.location.href = response.data.url;
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-                                <div className="flex-1 text-center md:text-left">
-                                    <h3 className="text-xl font-bold text-slate-800 mb-0.5">{booking.listing?.title || 'Listing'}</h3>
-                                    <p className="text-sm text-gray-400 mb-3">{booking.listing?.location}</p>
-                                    <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-4 gap-y-1 text-sm text-slate-600 font-medium">
-                                        <span>Check-in: {new Date(booking.checkIn).toLocaleDateString("en-GB")}</span>
-                                        <span className="hidden md:inline border-l border-gray-300 h-4"></span>
-                                        <span>Check-out: {new Date(booking.checkOut).toLocaleDateString("en-GB")}</span>
-                                        <span className="hidden md:inline border-l border-gray-300 h-4"></span>
-                                        <span>Guests: {booking.guests}</span>
-                                    </div>
-                                </div>
+  const handleDeleteBooking = async (bookingId: string) => {
+    try {
+      await apiRequest.delete(`/booking/delete`, {
+        data: { bookingId },
+      });
+      setBookings(bookings.filter((b: any) => b._id !== bookingId));
+    } catch (error) {
+      console.error("Error deleting booking:", error);
+    }
+    setConfirmDelete({ isOpen: false, bookingId: "" });
+  };
 
-                                <div className="flex flex-col items-center md:items-end gap-2 md:border-l md:border-gray-100 md:pl-6 w-full md:w-auto">
-                                    <div className="text-center md:text-right">
-                                        <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Total Price</p>
-                                        <p className="text-2xl font-black text-slate-900 leading-none">
-                                            ₹{booking.totalPrice?.toLocaleString()}
-                                        </p>
-                                    </div>
-
-                                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter shadow-sm border ${booking.isPaid ? 'bg-blue-600 text-white border-blue-700' :
-                                        booking.status === 'confirmed' ? 'bg-emerald-600 text-white border-emerald-700' :
-                                            booking.status === 'pending' ? 'bg-amber-500 text-white border-amber-600' :
-                                                'bg-rose-600 text-white border-rose-700'
-                                        }`}>
-                                        {booking.isPaid ? 'Paid' : booking.status || 'Pending'}
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center gap-3 w-full md:w-auto">
-                                    {booking.status === "pending" && (
-                                        <button
-                                            onClick={() => setConfirmDelete({ isOpen: true, bookingId: booking._id })}
-                                            className="flex-1 md:flex-none p-2.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors border border-transparent hover:border-rose-100"
-                                            title="Delete"
-                                        >
-                                            <Trash2 className="w-5 h-5 mx-auto" />
-                                        </button>
-                                    )}
-
-                                    {booking.status === 'confirmed' && !booking.isPaid && (
-                                        <button
-                                            onClick={() => handleCheckout(booking)}
-                                            className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all shadow-md hover:shadow-lg active:scale-95 uppercase text-sm tracking-wide"
-                                        >
-                                            Pay Now
-                                        </button>
-                                    )}
-                                </div>
-
-                            </div>
-                        </div>
-                    ))}
-
-                </div>
+  return (
+    <div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-4 border-b border-gray-100 gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="bg-red-50 p-2 sm:p-2.5 rounded-xl shadow-sm border border-red-100 shrink-0">
+            <Calendar size={20} className="text-primary sm:w-5.5 sm:h-5.5" />
+          </div>
+          <div>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">
+              Your Bookings
+            </h2>
+            {!loading && (
+              <p className="text-xs sm:text-sm text-gray-500 font-medium">
+                Total: {bookings.length}{" "}
+                {bookings.length === 1 ? "Booking" : "Bookings"}
+              </p>
             )}
-            
-            <ConfirmModal
-                isOpen={confirmDelete.isOpen}
-                onClose={() => setConfirmDelete({ isOpen: false, bookingId: '' })}
-                onConfirm={() => handleDeleteBooking(confirmDelete.bookingId)}
-                title="Delete Booking"
-                message="Are you sure you want to delete this booking? This action cannot be undone."
-            />
-            
-            
+          </div>
         </div>
-    )
-}
+      </div>
 
-export default YourBookListing
+      {loading ? (
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+        </div>
+      ) : bookings.length === 0 ? (
+        <div className="text-center py-8 bg-white rounded-xl border border-gray-100 shadow-sm mt-4">
+          <Calendar size={48} className="mx-auto text-gray-300 mb-3" />
+          <h2 className="text-[18px] font-semibold text-gray-900 mb-1">
+            No bookings yet
+          </h2>
+          <p className="text-gray-500 text-[14px]">
+            Start exploring and book your first stay!
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-6">
+          {bookings.map((booking: any) => (
+            <div
+              key={booking._id}
+              className="border-b border-gray-200 pb-6 last:border-0 last:pb-0"
+            >
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="w-full md:w-40 h-28 bg-gray-100 rounded-xl overflow-hidden shrink-0">
+                  <img
+                    src={booking.listing?.images?.[0] || "/placeholder.jpg"}
+                    alt={booking.listing?.title || "Listing"}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-start mb-1">
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {booking.listing?.title || "Listing"}
+                      </h3>
+                    </div>
+                    <p className="text-[15px] text-gray-500 mb-3">
+                      {booking.listing?.location}
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-700 font-normal">
+                      <span>
+                        {new Date(booking.checkIn).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}{" "}
+                        –{" "}
+                        {new Date(booking.checkOut).toLocaleDateString(
+                          "en-US",
+                          { month: "short", day: "numeric", year: "numeric" },
+                        )}
+                      </span>
+                      <span>·</span>
+                      <span>
+                        {booking.guests}{" "}
+                        {booking.guests === 1 ? "guest" : "guests"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-4 md:mt-0">
+                    <div className="flex items-center gap-3">
+                      <span className="font-semibold text-gray-900">
+                        ₹{booking.totalPrice?.toLocaleString()}
+                      </span>
+                      <span
+                        className={`text-sm ${
+                          booking.isPaid
+                            ? "text-green-600"
+                            : booking.status === "confirmed"
+                              ? "text-green-600"
+                              : booking.status === "pending"
+                                ? "text-yellow-600"
+                                : "text-red-600"
+                        }`}
+                      >
+                        •{" "}
+                        {booking.isPaid ? "Paid" : booking.status || "Pending"}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      {booking.status === "pending" && (
+                        <button
+                          onClick={() =>
+                            setConfirmDelete({
+                              isOpen: true,
+                              bookingId: booking._id,
+                            })
+                          }
+                          className="text-sm font-medium text-gray-700 underline hover:text-red-600 transition"
+                        >
+                          Cancel
+                        </button>
+                      )}
+
+                      {booking.status === "confirmed" && !booking.isPaid && (
+                        <button
+                          onClick={() => handleCheckout(booking)}
+                          className="bg-gray-900 hover:bg-black text-white font-semibold py-2.5 px-6 rounded-lg transition active:scale-95 text-[15px]"
+                        >
+                          Pay Now
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        onClose={() => setConfirmDelete({ isOpen: false, bookingId: "" })}
+        onConfirm={() => handleDeleteBooking(confirmDelete.bookingId)}
+        title="Delete Booking"
+        message="Are you sure you want to delete this booking? This action cannot be undone."
+      />
+    </div>
+  );
+};
+
+export default YourBookListing;

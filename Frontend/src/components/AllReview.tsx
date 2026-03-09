@@ -48,56 +48,62 @@ const AllReview = ({ listingId, refreshTrigger }: ReviewProps) => {
   return (
     <div className="space-y-4">
       {reviews.length === 0 ? (
-        <p className="text-gray-500 text-center py-4">No reviews yet</p>
+        <p className="text-gray-500 py-4">No reviews yet.</p>
       ) : (
-        <div
-          className="space-y-4 max-h-125 overflow-y-auto pr-2"
-          style={{ scrollbarWidth: "thin", scrollbarColor: "#cbd5e0 #f7fafc" }}
-        >
+        <div className="space-y-6 max-h-125 overflow-y-auto pr-4 scrollbar-hide">
           {reviews.map((review) => (
             <div
               key={review._id}
-              className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+              className="bg-white border-b border-gray-100 pb-6 last:border-0 last:pb-0"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                    {review.owner.username.charAt(0).toUpperCase()}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center text-white font-bold text-lg uppercase outline outline-gray-200 outline-offset-2">
+                    {review.owner.username.charAt(0)}
                   </div>
-                  <div>
-                    <p className="font-semibold text-gray-800">
+                  <div className="flex flex-col">
+                    <p className="font-semibold text-gray-900 text-[16px]">
                       {review.owner.username}
                     </p>
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <span
-                          key={i}
-                          className={`text-lg ${i < review.rating ? "text-yellow-400" : "text-gray-300"}`}
-                        >
-                          ★
-                        </span>
-                      ))}
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <span className="">
+                        {new Date(review.createdAt).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          },
+                        )}
+                      </span>
+                      <span>·</span>
+                      <div className="flex items-center">
+                        {[...Array(5)].map((_, i) => (
+                          <span
+                            key={i}
+                            className={`text-[15px] ${i < review.rating ? "text-gray-900" : "text-gray-300"}`}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-                <span className="text-xs text-gray-500">
-                  {new Date(review.createdAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </span>
+
+                {(currentUser?.admin ||
+                  currentUser?._id === review.owner._id) && (
+                  <button
+                    onClick={() => handleDeleteReview(review._id)}
+                    className="text-sm text-gray-400 hover:text-red-500 font-medium transition underline"
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
-              <p className="text-gray-700 leading-relaxed">{review.comment}</p>
-              {(currentUser?.admin ||
-                currentUser?._id === review.owner._id) && (
-                <button
-                  onClick={() => handleDeleteReview(review._id)}
-                  className="mt-3 text-sm text-red-600 hover:text-red-700 font-medium"
-                >
-                  Delete
-                </button>
-              )}
+              <p className="text-gray-700 leading-relaxed font-normal whitespace-pre-line">
+                {review.comment}
+              </p>
             </div>
           ))}
         </div>

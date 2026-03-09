@@ -4,24 +4,25 @@ import YourBookListing from "../components/YourBookListing";
 import YourListing from "../components/YourListing";
 
 const Profile = () => {
-
-
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white shadow-lg rounded-2xl p-6 mb-8">
+    <div className="min-h-screen bg-white py-12 px-4 xl:px-20 md:px-10">
+      <div className="max-w-5xl mx-auto flex flex-col gap-12">
+        <div>
+          <h1 className="text-[32px] font-semibold text-gray-900 tracking-tight mb-8">
+            Account
+          </h1>
           <UserProfileDetail />
         </div>
 
-        <div className="bg-white shadow-lg rounded-2xl p-6 mb-8">
+        <div className="pt-10 border-t border-gray-200">
           <YourBookListing />
         </div>
 
-        <div className="bg-white shadow-lg rounded-2xl p-6  mb-8">
+        <div className="pt-10 border-t border-gray-200">
           <YourListing />
         </div>
 
-        <div className="bg-white shadow-lg rounded-2xl p-6">
+        <div className="pt-10 border-t border-gray-200">
           <ListingOwnerBooking />
         </div>
       </div>
