@@ -91,15 +91,15 @@ const AllReview = ({ listingId, refreshTrigger }: ReviewProps) => {
                   </div>
                 </div>
 
-                {(currentUser?.admin ||
+                {(
                   currentUser?._id === review.owner._id) && (
-                  <button
-                    onClick={() => handleDeleteReview(review._id)}
-                    className="text-sm text-gray-400 hover:text-red-500 font-medium transition underline"
-                  >
-                    Delete
-                  </button>
-                )}
+                    <button
+                      onClick={() => handleDeleteReview(review._id)}
+                      className="text-sm text-gray-400 hover:text-red-500 font-medium transition underline"
+                    >
+                      Delete
+                    </button>
+                  )}
               </div>
               <p className="text-gray-700 leading-relaxed font-normal whitespace-pre-line">
                 {review.comment}
