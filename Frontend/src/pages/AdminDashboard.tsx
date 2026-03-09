@@ -145,7 +145,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex min-h-[calc(100vh-5rem)] bg-slate-50 overflow-hidden font-sans">
-      {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-30 lg:hidden transition-opacity"
@@ -153,7 +152,6 @@ const AdminDashboard = () => {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`fixed lg:static inset-y-0 left-0 z-40 w-72 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out flex flex-col pt-20 lg:pt-0 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
@@ -218,9 +216,7 @@ const AdminDashboard = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden relative">
-        {/* Mobile Header */}
         <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 p-4 lg:hidden flex items-center justify-between sticky top-0 z-30">
           <button
             onClick={() => setIsSidebarOpen(true)}
@@ -237,13 +233,11 @@ const AdminDashboard = () => {
                   ? "Reviews"
                   : activeTab}
           </h2>
-          <div className="w-10" /> {/* Spacer for centering */}
+          <div className="w-10" /> 
         </header>
 
-        {/* Content Area */}
         <div className="flex-1 overflow-auto p-4 md:p-8 lg:p-10 custom-scrollbar relative">
           <div className="max-w-7xl mx-auto space-y-8">
-            {/* Desktop Page Title */}
             <div className="hidden lg:flex items-center justify-between">
               <div>
                 <h2 className="text-3xl font-extrabold text-slate-900 capitalize tracking-tight">
@@ -267,7 +261,6 @@ const AdminDashboard = () => {
               <LoadingSkeleton />
             ) : (
               <>
-                {/* Overview Tab content */}
                 {activeTab === "overview" && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {statCards.map((stat, idx) => {
@@ -277,7 +270,6 @@ const AdminDashboard = () => {
                           key={idx}
                           className="bg-white rounded-2xl border border-slate-100 p-6 flex flex-col relative overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                         >
-                          {/* Decorative background blur */}
                           <div
                             className={`absolute -right-6 -top-6 w-24 h-24 rounded-full bg-linear-to-br ${stat.gradient} opacity-10 group-hover:opacity-20 transition-opacity blur-2xl`}
                           />
@@ -303,7 +295,6 @@ const AdminDashboard = () => {
                   </div>
                 )}
 
-                {/* Table content for other tabs */}
                 {activeTab !== "overview" && (
                   <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
                     <div className="overflow-x-auto">
@@ -716,7 +707,6 @@ const AdminDashboard = () => {
                               </tr>
                             ))}
 
-                          {/* Empty States */}
                           {activeTab === "bookings" &&
                             bookings.length === 0 && (
                               <tr>
