@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import apiRequest from "../utils/apiRequest";
 import useAuthStore from "../utils/authStore";
+import ConfirmModal from "./ConfirmModal";
 
 interface ReviewProps {
   listingId?: string;
@@ -21,6 +22,8 @@ interface ReviewData {
 const AllReview = ({ listingId, refreshTrigger }: ReviewProps) => {
   const [reviews, setReviews] = useState<ReviewData[]>([]);
   const { currentUser } = useAuthStore();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -34,19 +37,34 @@ const AllReview = ({ listingId, refreshTrigger }: ReviewProps) => {
     fetchReviews();
   }, [listingId, refreshTrigger]);
 
-  const handleDeleteReview = async (reviewId: string) => {
+  const handleDeleteReview = (reviewId: string) => {
+    setSelectedReviewId(reviewId);
+    setShowConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedReviewId) return;
     try {
       await apiRequest.delete(`/review/delete/${listingId}`, {
-        data: { reviewId },
+        data: { reviewId: selectedReviewId },
       });
-      setReviews(reviews.filter((review) => review._id !== reviewId));
+      setReviews(reviews.filter((review) => review._id !== selectedReviewId));
     } catch (error) {
       console.error("Error deleting review:", error);
     }
+    setShowConfirm(false);
+    setSelectedReviewId(null);
   };
 
   return (
     <div className="space-y-4">
+      <ConfirmModal
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={confirmDelete}
+        title="Delete Review"
+        message="Are you sure you want to delete this review? This action cannot be undone."
+      />
       {reviews.length === 0 ? (
         <p className="text-gray-500 py-4">No reviews yet.</p>
       ) : (

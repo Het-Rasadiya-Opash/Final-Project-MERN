@@ -106,8 +106,8 @@ const ListingPage = () => {
   const avgRating =
     reviewCount > 0
       ? (
-          reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviewCount
-        ).toFixed(1)
+        reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviewCount
+      ).toFixed(1)
       : 0;
 
   return (
@@ -156,8 +156,7 @@ const ListingPage = () => {
       <div className="mb-12">
         {listing.images && listing.images.length > 0 ? (
           <div
-            className={`grid gap-2 ${
-              listing.images.length === 1
+            className={`grid gap-2 ${listing.images.length === 1
                 ? "grid-cols-1 h-100 md:h-125"
                 : listing.images.length === 2
                   ? "grid-cols-1 md:grid-cols-2 h-100 md:h-125"
@@ -166,7 +165,7 @@ const ListingPage = () => {
                     : listing.images.length === 4
                       ? "grid-cols-1 md:grid-cols-2 gap-2 auto-rows-[200px] md:auto-rows-[250px]"
                       : "grid-cols-1 md:grid-cols-4 gap-2 auto-rows-[200px] md:auto-rows-[250px]"
-            }`}
+              }`}
           >
             {listing.images.map((img: string, index: number) => {
               let spanClass = "";
@@ -253,7 +252,7 @@ const ListingPage = () => {
             </p>
           </div>
 
-          {(isOwner || currentUser?.admin) && (
+          {/* {(isOwner || currentUser?.admin) && (
             <div className="py-8 border-b border-gray-200">
               <h2 className="text-xl font-semibold mb-4 text-gray-900">
                 Manage Listing
@@ -272,7 +271,7 @@ const ListingPage = () => {
                 </button>
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         <div className="col-span-1 border-t lg:border-t-0 pt-8 lg:pt-0">
@@ -310,7 +309,7 @@ const ListingPage = () => {
       </div>
 
       {listing.geometry?.coordinates && (
-        <div className="mt-12 py-12 border-t border-gray-200">
+        <div className="mt-12 py-12  border-gray-200">
           <h2 className="text-[22px] font-semibold text-gray-900 mb-6">
             Where you'll be
           </h2>

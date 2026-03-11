@@ -11,6 +11,7 @@ import {
   ChevronRight,
   TrendingUp,
 } from "lucide-react";
+import ConfirmModal from "../components/ConfirmModal";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -26,6 +27,12 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<{
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -88,45 +95,65 @@ const AdminDashboard = () => {
     { id: "bookings", label: "Bookings", icon: Ticket },
   ];
 
-  const handleDeleteListing = async (listingId: string) => {
-    if (!confirm("Are you sure you want to delete this listing?")) return;
-
-    try {
-      await apiRequest.delete(`/listing/${listingId}`);
-      setListings(listings.filter((l: any) => l._id !== listingId));
-      setStats((prev) => ({ ...prev, totalListings: prev.totalListings - 1 }));
-    } catch (error) {
-      console.error("Error deleting listing:", error);
-      alert("Failed to delete listing");
-    }
+  const handleDeleteListing = (listingId: string) => {
+    setConfirmAction({
+      title: "Delete Listing",
+      message: "Are you sure you want to delete this listing? This action cannot be undone.",
+      onConfirm: async () => {
+        try {
+          await apiRequest.delete(`/listing/${listingId}`);
+          setListings(listings.filter((l: any) => l._id !== listingId));
+          setStats((prev) => ({ ...prev, totalListings: prev.totalListings - 1 }));
+        } catch (error) {
+          console.error("Error deleting listing:", error);
+          alert("Failed to delete listing");
+        }
+        setShowConfirm(false);
+      },
+    });
+    setShowConfirm(true);
   };
 
-  const handleDeleteReview = async (reviewId: string, listingId: string) => {
-    if (!confirm("Are you sure you want to delete this review?")) return;
-    try {
-      await apiRequest.delete(`/review/delete/${listingId}`, {
-        data: { reviewId },
-      });
-      setReviews(reviews.filter((r: any) => r._id !== reviewId));
-      setStats((prev) => ({ ...prev, totalReviews: prev.totalReviews - 1 }));
-    } catch (error) {
-      console.error("Error deleting review:", error);
-      alert("Failed to delete review");
-    }
+  const handleDeleteReview = (reviewId: string, listingId: string) => {
+    setConfirmAction({
+      title: "Delete Review",
+      message: "Are you sure you want to delete this review? This action cannot be undone.",
+      onConfirm: async () => {
+        try {
+          await apiRequest.delete(`/review/delete/${listingId}`, {
+            data: { reviewId },
+          });
+          setReviews(reviews.filter((r: any) => r._id !== reviewId));
+          setStats((prev) => ({ ...prev, totalReviews: prev.totalReviews - 1 }));
+        } catch (error) {
+          console.error("Error deleting review:", error);
+          alert("Failed to delete review");
+        }
+        setShowConfirm(false);
+      },
+    });
+    setShowConfirm(true);
   };
 
-  const handleDeleteBooking = async (bookingId: string) => {
-    if (!confirm("Are you sure you want to delete this booking?")) return;
-    try {
-      await apiRequest.delete(`/booking/delete`, {
-        data: { bookingId },
-      });
-      setBookings(bookings.filter((b) => b._id !== bookingId));
-      setStats((prev) => ({ ...prev, totalBookings: prev.totalBookings - 1 }));
-    } catch (error) {
-      console.error("Error deleting booking:", error);
-      alert("Failed to delete booking");
-    }
+  const handleDeleteBooking = (bookingId: string) => {
+    setConfirmAction({
+      title: "Delete Booking",
+      message: "Are you sure you want to delete this booking? This action cannot be undone.",
+      onConfirm: async () => {
+        try {
+          await apiRequest.delete(`/booking/delete`, {
+            data: { bookingId },
+          });
+          setBookings(bookings.filter((b) => b._id !== bookingId));
+          setStats((prev) => ({ ...prev, totalBookings: prev.totalBookings - 1 }));
+        } catch (error) {
+          console.error("Error deleting booking:", error);
+          alert("Failed to delete booking");
+        }
+        setShowConfirm(false);
+      },
+    });
+    setShowConfirm(true);
   };
 
   const LoadingSkeleton = () => (
@@ -145,6 +172,13 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex min-h-[calc(100vh-5rem)] bg-slate-50 overflow-hidden font-sans">
+      <ConfirmModal
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={confirmAction?.onConfirm || (() => {})}
+        title={confirmAction?.title || ""}
+        message={confirmAction?.message || ""}
+      />
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-30 lg:hidden transition-opacity"
