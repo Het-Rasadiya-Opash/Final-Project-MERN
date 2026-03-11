@@ -5,10 +5,15 @@ import apiRequest from "../utils/apiRequest";
 import { Menu, User, Search } from "lucide-react";
 
 const Navbar = () => {
-  const { currentUser, removeCurrentUser } = useAuthStore();
+  const { currentUser, removeCurrentUser, checkTokenExpiry } = useAuthStore();
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Check token expiry when component mounts
+    checkTokenExpiry();
+  }, [checkTokenExpiry]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

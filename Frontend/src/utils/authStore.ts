@@ -15,6 +15,7 @@ interface AuthStore {
   setCurrentUser: (newUser: User) => void;
   removeCurrentUser: () => void;
   checkTokenExpiry: () => void;
+  isTokenExpired: () => boolean;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -31,14 +32,27 @@ const useAuthStore = create<AuthStore>()(
         const { tokenExpiry } = get();
         if (tokenExpiry && Date.now() > tokenExpiry) {
           set({ currentUser: null, tokenExpiry: null });
+          return true;
         }
+        return false;
+      },
+      isTokenExpired: () => {
+        const { tokenExpiry } = get();
+        return tokenExpiry ? Date.now() > tokenExpiry : false;
       },
     }),
     { name: "auth-storage" },
   ),
 );
 
+// Check token expiry every minute
 setInterval(() => {
   useAuthStore.getState().checkTokenExpiry();
 }, 60000); 
+
+// Check token expiry on app load
+if (typeof window !== 'undefined') {
+  useAuthStore.getState().checkTokenExpiry();
+}
+
 export default useAuthStore;
