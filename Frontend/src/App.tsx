@@ -11,10 +11,12 @@ import AdminRoutes from "./components/AdminRoutes";
 import AdminDashboard from "./pages/AdminDashboard";
 import BookingForm from "./pages/BookingForm";
 import Wishlist from "./pages/Wishlist";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
     <>
+     <Toaster position="bottom-center" reverseOrder={false} />
       <Navbar />
       <div className="pt-20">
         <Routes>
