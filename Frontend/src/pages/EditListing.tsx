@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import apiRequest from "../utils/apiRequest";
 import { X } from "lucide-react";
@@ -28,6 +28,7 @@ const EditListing = () => {
   const [error, setError] = useState("");
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -99,11 +100,15 @@ const EditListing = () => {
   };
 
   const handleRemoveNewImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+    const newImages = images.filter((_, i) => i !== index);
+    setImages(newImages);
     setImagePreviews((prev) => {
       URL.revokeObjectURL(prev[index]);
       return prev.filter((_, i) => i !== index);
     });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const inputStyles = "w-full px-4 py-3.5 rounded-xl border border-gray-400 focus:ring-2 focus:ring-black focus:border-black outline-none transition duration-200 text-gray-900";
@@ -171,24 +176,23 @@ const EditListing = () => {
             )}
 
             <div>
-              <label className={labelStyles}>
-                Add More Photos
-              </label>
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageChange}
-                className="w-full text-sm border border-gray-400 rounded-xl px-4 py-3 
-                file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 
-                file:text-sm file:font-medium file:bg-gray-100 file:text-gray-900 
-                hover:file:bg-gray-200 transition cursor-pointer"
-              />
-              {images.length > 0 && (
-                <p className="text-sm font-medium text-primary mt-2">
-                  {images.length} new photo(s) selected
-                </p>
-              )}
+              <label className={labelStyles}>Add More Photos</label>
+              <div className="relative">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  ref={fileInputRef}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <div className="w-full text-sm border border-gray-400 rounded-xl px-4 py-3 flex items-center gap-3 pointer-events-none">
+                  <span className="py-2 px-4 rounded-full bg-gray-100 text-gray-900 text-sm font-medium">Choose Files</span>
+                  <span className="text-gray-500">
+                    {images.length === 0 ? "No file chosen" : `${images.length} file${images.length > 1 ? "s" : ""}`}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
