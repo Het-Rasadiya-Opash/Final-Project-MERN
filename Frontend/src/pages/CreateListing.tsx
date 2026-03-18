@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiRequest from "../utils/apiRequest";
 import { Loader2, MapPin, X } from "lucide-react";
@@ -28,6 +28,7 @@ const CreateListing = () => {
   const [error, setError] = useState("");
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [gettingLocation, setGettingLocation] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,11 +65,15 @@ const CreateListing = () => {
   };
 
   const handleRemoveNewImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+    const newImages = images.filter((_, i) => i !== index);
+    setImages(newImages);
     setImagePreviews((prev) => {
       URL.revokeObjectURL(prev[index]);
       return prev.filter((_, i) => i !== index);
     });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const getCurrentLocation = () => {
@@ -115,18 +120,25 @@ const CreateListing = () => {
 
           <div className="border border-gray-200 p-6 rounded-2xl shadow-sm">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Photos</h2>
-            <div>
+            <div className="relative">
               <input
                 type="file"
                 multiple
                 onChange={handleImageChange}
                 accept="image/*"
+                ref={fileInputRef}
                 className="w-full text-sm border border-gray-400 rounded-xl px-4 py-3 
                 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 
                 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-900 
-                hover:file:bg-gray-200 transition cursor-pointer"
-                required
+                hover:file:bg-gray-200 transition cursor-pointer opacity-0 absolute inset-0 h-full"
+                required={images.length === 0}
               />
+              <div className="w-full text-sm border border-gray-400 rounded-xl px-4 py-3 flex items-center gap-3 pointer-events-none">
+                <span className="py-2 px-4 rounded-full bg-gray-100 text-gray-900 text-sm font-medium">Choose Files</span>
+                <span className="text-gray-500">
+                  {images.length === 0 ? "No file chosen" : `${images.length} file${images.length > 1 ? "s" : ""}`}
+                </span>
+              </div>
             </div>
             
             {imagePreviews.length > 0 && (
