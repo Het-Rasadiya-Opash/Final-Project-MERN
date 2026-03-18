@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import apiRequest from "../utils/apiRequest";
-import { Calendar } from "lucide-react";
+import { Calendar, Users } from "lucide-react";
 import ConfirmModal from "./ConfirmModal";
 
 const YourBookListing = () => {
@@ -132,7 +132,8 @@ const YourBookListing = () => {
                     </p>
 
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-700 font-normal">
-                      <span>
+                      <span className="flex items-center gap-1.5">
+                        <Calendar size={14} className="text-gray-400 shrink-0" />
                         {new Date(booking.checkIn).toLocaleDateString("en-US", {
                           month: "short",
                           day: "numeric",
@@ -143,31 +144,40 @@ const YourBookListing = () => {
                           { month: "short", day: "numeric", year: "numeric" },
                         )}
                       </span>
-                      <span>·</span>
-                      <span>
+                      <span className="text-gray-300">·</span>
+                      <span className="flex items-center gap-1.5">
+                        <Users size={14} className="text-gray-400 shrink-0" />
                         {booking.guests}{" "}
                         {booking.guests === 1 ? "guest" : "guests"}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between mt-4 md:mt-0">
-                    <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center justify-between mt-4 md:mt-0 gap-3">
+                    <div className="flex items-center gap-3 mt-2">
                       <span className="font-semibold text-gray-900">
                         ₹{booking.totalPrice?.toLocaleString()}
                       </span>
                       <span
-                        className={`text-sm ${
+                        className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${
                           booking.isPaid
-                            ? "text-green-600"
+                            ? "bg-green-50 text-green-700 border-green-200"
                             : booking.status === "confirmed"
-                              ? "text-green-600"
+                              ? "bg-blue-50 text-blue-700 border-blue-200"
                               : booking.status === "pending"
-                                ? "text-yellow-600"
-                                : "text-red-600"
+                                ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                : "bg-red-50 text-red-700 border-red-200"
                         }`}
                       >
-                        •{" "}
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          booking.isPaid
+                            ? "bg-green-500"
+                            : booking.status === "confirmed"
+                              ? "bg-blue-500"
+                              : booking.status === "pending"
+                                ? "bg-yellow-500"
+                                : "bg-red-500"
+                        }`} />
                         {booking.isPaid ? "Paid" : booking.status || "Pending"}
                       </span>
                     </div>
