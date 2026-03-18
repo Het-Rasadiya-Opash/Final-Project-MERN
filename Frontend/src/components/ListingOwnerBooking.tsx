@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import apiRequest from "../utils/apiRequest";
-import { ChevronDown, Trash2, Calendar } from "lucide-react";
+import { ChevronDown, Trash2, Calendar, User, Mail, LogIn, LogOut, IndianRupee } from "lucide-react";
 import ConfirmModal from "./ConfirmModal";
 
 const ListingOwnerBooking = () => {
@@ -169,55 +169,58 @@ const ListingOwnerBooking = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-[15px]">
-                    <div>
-                      <p className="text-gray-500 mb-0.5 font-normal">Guest</p>
-                      <p className="font-medium text-gray-900">
-                        {booking.customer?.username || "N/A"}
-                      </p>
-                      <p className="text-sm text-gray-500 truncate">
-                        {booking.customer?.email || "N/A"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 mb-0.5 font-normal">
-                        Check-in
-                      </p>
-                      <p className="font-medium text-gray-900">
-                        {new Date(booking.checkIn).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 mb-0.5 font-normal">
-                        Check-out
-                      </p>
-                      <p className="font-medium text-gray-900">
-                        {new Date(booking.checkOut).toLocaleDateString(
-                          "en-US",
-                          { month: "short", day: "numeric", year: "numeric" },
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex justify-between items-end">
+                  <div className="flex flex-wrap items-start gap-6 text-[15px]">
+                    <div className="flex items-start gap-2">
+                      <div className="mt-0.5 p-1.5 bg-gray-100 rounded-lg shrink-0">
+                        <User size={14} className="text-gray-500" />
+                      </div>
                       <div>
-                        <p className="text-gray-500 mb-0.5 font-normal">
-                          Total Earned
-                        </p>
-                        <p className="font-semibold text-gray-900">
-                          ₹{booking.totalPrice?.toLocaleString()}
+                        <p className="text-gray-500 text-xs mb-0.5 font-normal">Guest</p>
+                        <p className="font-medium text-gray-900">{booking.customer?.username || "N/A"}</p>
+                        <p className="text-sm text-gray-500 truncate flex items-center gap-1">
+                          <Mail size={11} className="shrink-0" />
+                          {booking.customer?.email || "N/A"}
                         </p>
                       </div>
+                    </div>
+
+                    <div className="flex items-start gap-2">
+                      <div className="mt-0.5 p-1.5 bg-green-50 rounded-lg shrink-0">
+                        <LogIn size={14} className="text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs mb-0.5 font-normal">Check-in</p>
+                        <p className="font-medium text-gray-900">
+                          {new Date(booking.checkIn).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-2">
+                      <div className="mt-0.5 p-1.5 bg-red-50 rounded-lg shrink-0">
+                        <LogOut size={14} className="text-red-500" />
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs mb-0.5 font-normal">Check-out</p>
+                        <p className="font-medium text-gray-900">
+                          {new Date(booking.checkOut).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-2">
+                      <div className="mt-0.5 p-1.5 bg-emerald-50 rounded-lg shrink-0">
+                        <IndianRupee size={14} className="text-emerald-600" />
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs mb-0.5 font-normal">Total Earned</p>
+                        <p className="font-semibold text-gray-900">₹{booking.totalPrice?.toLocaleString()}</p>
+                      </div>
+                    </div>
+
+                    <div className="ml-auto flex items-center">
                       <button
-                        onClick={() =>
-                          setConfirmDelete({
-                            isOpen: true,
-                            bookingId: booking._id,
-                          })
-                        }
+                        onClick={() => setConfirmDelete({ isOpen: true, bookingId: booking._id })}
                         className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
                         title="Delete Record"
                       >
