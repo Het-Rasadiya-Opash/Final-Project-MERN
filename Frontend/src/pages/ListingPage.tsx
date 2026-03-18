@@ -157,14 +157,14 @@ const ListingPage = () => {
         {listing.images && listing.images.length > 0 ? (
           <div
             className={`grid gap-2 ${listing.images.length === 1
-                ? "grid-cols-1 h-100 md:h-125"
-                : listing.images.length === 2
-                  ? "grid-cols-1 md:grid-cols-2 h-100 md:h-125"
-                  : listing.images.length === 3
-                    ? "grid-cols-1 md:grid-cols-3 h-100 md:h-125"
-                    : listing.images.length === 4
-                      ? "grid-cols-1 md:grid-cols-2 gap-2 auto-rows-[200px] md:auto-rows-[250px]"
-                      : "grid-cols-1 md:grid-cols-4 gap-2 auto-rows-[200px] md:auto-rows-[250px]"
+              ? "grid-cols-1 h-100 md:h-125"
+              : listing.images.length === 2
+                ? "grid-cols-1 md:grid-cols-2 h-100 md:h-125"
+                : listing.images.length === 3
+                  ? "grid-cols-1 md:grid-cols-3 h-100 md:h-125"
+                  : listing.images.length === 4
+                    ? "grid-cols-1 md:grid-cols-2 gap-2 auto-rows-[200px] md:auto-rows-[250px]"
+                    : "grid-cols-1 md:grid-cols-4 gap-2 auto-rows-[200px] md:auto-rows-[250px]"
               }`}
           >
             {listing.images.map((img: string, index: number) => {
@@ -252,7 +252,7 @@ const ListingPage = () => {
             </p>
           </div>
 
-          {/* {(isOwner || currentUser?.admin) && (
+          {(isOwner) && (
             <div className="py-8 border-b border-gray-200">
               <h2 className="text-xl font-semibold mb-4 text-gray-900">
                 Manage Listing
@@ -271,7 +271,7 @@ const ListingPage = () => {
                 </button>
               </div>
             </div>
-          )} */}
+          )}
         </div>
 
         <div className="col-span-1 border-t lg:border-t-0 pt-8 lg:pt-0">
