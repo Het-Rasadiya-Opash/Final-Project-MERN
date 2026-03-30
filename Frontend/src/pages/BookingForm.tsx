@@ -92,9 +92,9 @@ const BookingForm = () => {
 
   const basePrice = listing?.price || 0;
   const totalCost = basePrice * nights;
-  const cleaningFee = nights > 0 ? Math.round(basePrice * 0.1) : 0; // Simulated 10% cleaning fee
-  const serviceFee = nights > 0 ? Math.round(totalCost * 0.15) : 0; // Simulated 15% service fee
-  const finalTotal = totalCost + cleaningFee + serviceFee;
+  const cleaningFee = 0; // hide actual cleaning fee cost
+  const serviceFee = 0; // hide actual service fee cost
+  const finalTotal = totalCost; // total is based on nights only
 
   const reviewCount = reviews.length;
   const avgRating =
@@ -303,13 +303,13 @@ const BookingForm = () => {
                         <span className="underline decoration-gray-300 hover:text-black cursor-pointer">
                           Cleaning fee
                         </span>
-                        <span>₹{cleaningFee.toLocaleString()}</span>
+                        <span>Included</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="underline decoration-gray-300 hover:text-black cursor-pointer">
                           Service fee
                         </span>
-                        <span>₹{serviceFee.toLocaleString()}</span>
+                        <span>Included</span>
                       </div>
                     </>
                   )}
