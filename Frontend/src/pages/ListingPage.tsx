@@ -340,7 +340,6 @@ const ListingPage = () => {
       )}
 
 
-      <SimilarListings listingId={id!} />
       <ReviewContainer id={id!} />
       <SimilarListings listingId={id!} />
 
