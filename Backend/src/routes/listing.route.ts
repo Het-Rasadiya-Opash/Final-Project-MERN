@@ -4,8 +4,11 @@ import {
   deleteListingImage,
   getAllListings,
   getListingById,
+  getListingStats,
+  getSimilarListings,
   getUserListing,
   getUserListingCSVData,
+  incrementListingViews,
   updateListing,
   userDeleteListing,
 } from "../controllers/listing.controller.js";
@@ -20,6 +23,9 @@ router.get("/user-listing", verifyToken, getUserListing);
 router.get("/csv-data", verifyToken, getUserListingCSVData);
 
 router.get("/:id", getListingById);
+router.post("/:id/view", incrementListingViews);
+router.get("/:id/similar", getSimilarListings);
+router.get("/:id/stats", verifyToken, getListingStats);
 router.delete("/:listingId", verifyToken, userDeleteListing);
 router.put(
   "/:listingId",

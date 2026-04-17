@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import apiRequest from "../utils/apiRequest";
 import useAuthStore from "../utils/authStore";
@@ -6,7 +6,8 @@ import Map from "../components/Map";
 import ReviewContainer from "../components/ReviewContainer";
 import ConfirmModal from "../components/ConfirmModal";
 import AvailabilityCalendar from "../components/AvailabilityCalendar";
-import { Heart, MapPin, DoorOpen, Star } from "lucide-react";
+import SimilarListings from "../components/SimilarListings";
+import { Heart, MapPin, DoorOpen, Star, Eye } from "lucide-react";
 
 interface ReviewData {
   _id: string;
@@ -23,6 +24,7 @@ const ListingPage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { currentUser } = useAuthStore();
   const navigate = useNavigate();
+  const viewTracked = useRef(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,6 +36,11 @@ const ListingPage = () => {
 
         setListing(listingRes.data.data);
         setReviews(reviewsRes.data.data || []);
+
+        if (!viewTracked.current) {
+          viewTracked.current = true;
+          apiRequest.post(`/listing/${id}/view`).catch(() => { });
+        }
       } catch (error) {
         console.error("Failed to fetch listing data:", error);
       } finally {
@@ -260,6 +267,12 @@ const ListingPage = () => {
               <h2 className="text-xl font-semibold mb-4 text-gray-900">
                 Manage Listing
               </h2>
+              {listing.views !== undefined && (
+                <div className="flex items-center gap-2 text-gray-600 mb-4 text-sm">
+                  <Eye size={16} />
+                  <span>{listing.views.toLocaleString()} {listing.views === 1 ? "view" : "views"}</span>
+                </div>
+              )}
               <div className="flex gap-4">
                 <Link to={`/update-listing/${listing._id}`}>
                   <button className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-lg transition border border-gray-300">
@@ -326,7 +339,10 @@ const ListingPage = () => {
         </div>
       )}
 
+
+      <SimilarListings listingId={id!} />
       <ReviewContainer id={id!} />
+      <SimilarListings listingId={id!} />
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}

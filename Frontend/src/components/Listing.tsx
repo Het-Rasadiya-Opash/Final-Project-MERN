@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Heart, Trash2, Star } from "lucide-react";
+import { Heart, Trash2, Star, Eye } from "lucide-react";
 import useAuthStore from "../utils/authStore";
 import apiRequest from "../utils/apiRequest";
 import { useState, useEffect } from "react";
@@ -11,6 +11,7 @@ interface ListingProps {
     images: string[];
     price?: number;
     location?: string;
+    views?: number;
     owner?: { _id: string; username?: string; email?: string };
   };
   onDelete?: (listingId: string) => void;
@@ -138,6 +139,13 @@ const Listing = ({ listing, onDelete }: ListingProps) => {
         <p className="text-gray-500 font-normal text-[15px] line-clamp-1 mb-1">
           Stay with {listing.owner?.username || "Host"}
         </p>
+
+        {listing.views !== undefined && (
+          <p className="flex items-center gap-1 text-gray-400 text-[13px] mb-1">
+            <Eye size={12} />
+            {listing.views.toLocaleString()} {listing.views === 1 ? "view" : "views"}
+          </p>
+        )}
 
         <div className="mt-1 flex items-baseline gap-1">
           <span className="font-semibold text-[15px] text-gray-900">

@@ -124,6 +124,16 @@ export const getAllListings = async (req: Request, res: Response) => {
   }
 };
 
+export const incrementListingViews = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    await listingModel.findByIdAndUpdate(id, { $inc: { views: 1 } });
+    return res.status(200).json({ success: true });
+  } catch {
+    return res.status(500).json({ success: false });
+  }
+};
+
 export const getListingById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -146,6 +156,46 @@ export const getListingById = async (req: Request, res: Response) => {
       message: "Failed to fetch listing",
       error: error instanceof Error ? error.message : "Unknown error",
     });
+  }
+};
+
+export const getSimilarListings = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const listing = await listingModel.findById(id, "category");
+    if (!listing)
+      return res
+        .status(404)
+        .json({ success: false, message: "Listing not found" });
+    const similar = await listingModel
+      .find({ category: listing.category, _id: { $ne: id as string } })
+      .populate("owner", "username email")
+      .limit(4);
+    return res.status(200).json({ success: true, data: similar });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch similar listings" });
+  }
+};
+
+export const getListingStats = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const listing = await listingModel.findById(id, "views owner");
+    if (!listing)
+      return res
+        .status(404)
+        .json({ success: false, message: "Listing not found" });
+    const ownerId = (req as any).user._id;
+    if (listing.owner.toString() !== ownerId.toString()) {
+      return res.status(403).json({ success: false, message: "Access denied" });
+    }
+    return res.status(200).json({ success: true, views: listing.views });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch stats" });
   }
 };
 
@@ -178,7 +228,7 @@ export const userDeleteListing = async (req: Request, res: Response) => {
 
   const ownerId = (req as any).user._id;
   const isAdmin = (req as any).user.admin;
-  
+
   try {
     const listing = await listingModel.findById(listingId);
     if (!listing) {
@@ -203,8 +253,6 @@ export const userDeleteListing = async (req: Request, res: Response) => {
 
     await bookingModel.deleteMany({ listing: listingId } as any);
     await likeModel.deleteMany({ listing: listingId } as any);
-    
-    
 
     await listingModel.findByIdAndDelete(listingId);
 

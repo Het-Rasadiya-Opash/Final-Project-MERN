@@ -15,6 +15,7 @@ interface Listing {
     | "countryside";
   owner: mongoose.Types.ObjectId;
   reviews?: mongoose.Types.ObjectId[];
+  views: number;
   geometry: {
     type: {
       type: String;
@@ -91,6 +92,10 @@ const listingSchema = new mongoose.Schema<ListingDocument>(
         ref: "Review",
       },
     ],
+    views: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

@@ -60,197 +60,157 @@ const YourBookListing = () => {
 
   const handleDownloadInvoice = async (booking: any) => {
     const doc = new jsPDF({ unit: "mm", format: "a4" });
+
     const W = 210;
-    const PX = 16; // horizontal padding
-    const primary: [number, number, number] = [255, 56, 92];
-    const primaryDark: [number, number, number] = [215, 4, 102];
-    const dark: [number, number, number] = [17, 24, 39];
-    const gray: [number, number, number] = [100, 110, 125];
-    const lightBg: [number, number, number] = [252, 252, 253];
-    const white: [number, number, number] = [255, 255, 255];
-    const borderColor: [number, number, number] = [230, 232, 236];
+    const PX = 16;
 
-    // ── HEADER ────────────────────────────────────────────────────────
+    const primary: [number, number, number] = [99, 102, 241]; // Indigo (modern SaaS)
+    const dark: [number, number, number] = [31, 41, 55];
+    const gray: [number, number, number] = [107, 114, 128];
+    const light: [number, number, number] = [243, 244, 246];
+
+    // ───────── HEADER ─────────
     doc.setFillColor(...primary);
-    doc.rect(0, 0, W, 42, "F");
-    doc.setFillColor(...primaryDark);
-    doc.rect(0, 38, W, 4, "F");
+    doc.rect(0, 0, W, 35, "F");
 
-    doc.setTextColor(...white);
+    doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
+    doc.setFontSize(18);
     doc.text("ListingHouse", PX, 18);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.text("Property Rental Platform", PX, 25);
 
-    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Premium Property Rentals", PX, 25);
+
     doc.setFontSize(20);
-    doc.text("INVOICE", W - PX, 18, { align: "right" });
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.text(`No. ${booking._id?.slice(-10).toUpperCase()}`, W - PX, 25, { align: "right" });
-
-    // ── META ROW ──────────────────────────────────────────────────────
-    const issueDate = new Date().toLocaleDateString("en-IN", {
-      day: "2-digit", month: "long", year: "numeric",
-    });
-    doc.setTextColor(...gray);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8.5);
-    doc.text(`Issue Date: ${issueDate}`, PX, 52);
-
-    // PAID pill
-    doc.setFillColor(220, 252, 231);
-    doc.roundedRect(W - PX - 28, 46, 28, 9, 2, 2, "F");
-    doc.setDrawColor(134, 239, 172);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(W - PX - 28, 46, 28, 9, 2, 2, "S");
-    doc.setTextColor(21, 128, 61);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.text("PAID", W - PX - 14, 51.8, { align: "center" });
+    doc.text("INVOICE", W - PX, 18, { align: "right" });
 
-    // ── PROPERTY IMAGE ────────────────────────────────────────────────
-    const imageUrl = booking.listing?.images?.[0];
-    const imgX = PX;
-    const imgW = W - PX * 2;
-    const imgH = 50;
-    const imgY = 58;
+    // ───────── INVOICE META ─────────
+    const yStart = 45;
 
-    if (imageUrl) {
-      try {
-        const res = await fetch(imageUrl);
-        const blob = await res.blob();
-        const base64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-        const mimeMatch = base64.match(/^data:image\/([a-zA-Z]+);/);
-        const ext = mimeMatch ? mimeMatch[1].toUpperCase() : "JPEG";
-        const safeExt = ["JPEG", "JPG", "PNG", "WEBP"].includes(ext) ? ext : "JPEG";
-        doc.addImage(base64, safeExt, imgX, imgY, imgW, imgH, undefined, "FAST");
+    doc.setTextColor(...gray);
+    doc.setFontSize(9);
 
-        // dark overlay bar at bottom of image for title text
-        doc.setFillColor(0, 0, 0);
-        doc.rect(imgX, imgY + imgH - 16, imgW, 16, "F");
+    doc.text(`Invoice ID: ${booking._id.slice(-8).toUpperCase()}`, PX, yStart);
+    doc.text(
+      `Date: ${new Date().toLocaleDateString("en-IN")}`,
+      PX,
+      yStart + 6
+    );
 
-        doc.setTextColor(...white);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(10);
-        const title = booking.listing?.title || "Property";
-        doc.text(
-          title.length > 50 ? title.slice(0, 47) + "..." : title,
-          imgX + 4,
-          imgY + imgH - 5,
-        );
-      } catch {
-        // image failed — skip silently
-      }
-    }
+    // Status Badge
+    doc.setFillColor(220, 252, 231);
+    doc.roundedRect(W - PX - 30, yStart - 5, 30, 10, 3, 3, "F");
 
-    // ── PROPERTY DETAILS SECTION ──────────────────────────────────────
-    let y = imgY + imgH + 10;
+    doc.setTextColor(22, 163, 74);
+    doc.setFont("helvetica", "bold");
+    doc.text("PAID", W - PX - 15, yStart + 1, { align: "center" });
 
-    const drawSectionHeader = (label: string, yPos: number) => {
-      doc.setFillColor(255, 245, 247);
-      doc.rect(PX, yPos, W - PX * 2, 8, "F");
-      doc.setFillColor(...primary);
-      doc.rect(PX, yPos, 3, 8, "F");
-      doc.setTextColor(...primary);
+    // ───────── BILLING SECTION ─────────
+    let y = 60;
+
+    const drawBox = (title: string, x: number, y: number, w: number) => {
+      doc.setFillColor(...light);
+      doc.rect(x, y, w, 20, "F");
+
+      doc.setTextColor(...dark);
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(7.5);
-      doc.text(label, PX + 6, yPos + 5.5);
+      doc.setFontSize(9);
+      doc.text(title, x + 3, y + 5);
     };
 
-    drawSectionHeader("PROPERTY DETAILS", y);
-    y += 12;
+    // Customer
+    drawBox("BILLED TO", PX, y, 85);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text(booking.user?.name || "Customer", PX + 3, y + 12);
 
-    if (!imageUrl) {
-      doc.setTextColor(...dark);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      const title = booking.listing?.title || "Property";
-      doc.text(
-        title.length > 55 ? title.slice(0, 52) + "..." : title,
-        PX, y,
-      );
-      y += 7;
-    }
+    // Company
+    drawBox("FROM", W - PX - 85, y, 85);
+    doc.text("ListingHouse Pvt Ltd", W - PX - 82, y + 12);
 
-    doc.setTextColor(...gray);
+    y += 30;
+
+    // ───────── PROPERTY ─────────
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(...dark);
+    doc.text(booking.listing?.title || "Property", PX, y);
+
+    y += 6;
+
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
-    doc.text(`Location: ${booking.listing?.location || "-"}`, PX, y);
-    y += 14;
+    doc.setTextColor(...gray);
+    doc.text(`Location: ${booking.listing?.location}`, PX, y);
 
-    // ── BOOKING DETAILS TABLE ─────────────────────────────────────────
-    drawSectionHeader("BOOKING DETAILS", y);
-    y += 12;
+    y += 10;
 
-    const rows: [string, string][] = [
-      ["Check-in",      new Date(booking.checkIn).toLocaleDateString("en-IN", { weekday: "short", day: "2-digit", month: "short", year: "numeric" })],
-      ["Check-out",     new Date(booking.checkOut).toLocaleDateString("en-IN", { weekday: "short", day: "2-digit", month: "short", year: "numeric" })],
-      ["Duration",      `${booking.stayDay} ${booking.stayDay === 1 ? "night" : "nights"}`],
-      ["Guests",        `${booking.guests} ${booking.guests === 1 ? "guest" : "guests"}`],
-      ["Price / night", `Rs. ${booking.listing?.price?.toLocaleString("en-IN") ?? "-"}`],
-    ];
+    // ───────── TABLE HEADER ─────────
+    doc.setFillColor(...light);
+    doc.rect(PX, y, W - PX * 2, 10, "F");
 
-    const rowH = 10;
-    rows.forEach(([label, value], i) => {
-      const rowY = y + i * rowH;
-      doc.setFillColor(i % 2 === 0 ? 255 : 249, i % 2 === 0 ? 255 : 249, i % 2 === 0 ? 255 : 251);
-      doc.rect(PX, rowY, W - PX * 2, rowH, "F");
-      doc.setDrawColor(...borderColor);
-      doc.setLineWidth(0.25);
-      doc.line(PX, rowY + rowH, W - PX, rowY + rowH);
+    doc.setTextColor(...dark);
+    doc.setFont("helvetica", "bold");
+    doc.text("Description", PX + 2, y + 7);
+    doc.text("Amount", W - PX - 2, y + 7, { align: "right" });
 
-      doc.setTextColor(...gray);
+    y += 10;
+
+    // ───────── ROWS ─────────
+    const price = booking.listing?.price || 0;
+    const nights = booking.stayDay || 1;
+    const subtotal = price * nights;
+    
+    const total = subtotal 
+
+    const row = (label: string, value: number) => {
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.text(label, PX + 4, rowY + 6.5);
+      doc.setTextColor(...gray);
+      doc.text(label, PX + 2, y + 6);
 
       doc.setTextColor(...dark);
-      doc.setFont("helvetica", "bold");
-      doc.text(value, W - PX - 4, rowY + 6.5, { align: "right" });
+      doc.text(`Rs. ${value.toLocaleString("en-IN")}`, W - PX - 2, y + 6, {
+        align: "right",
+      });
+
+      y += 8;
+    };
+
+    row(`Stay (${nights} nights)`, subtotal);
+    
+
+    // Divider
+    doc.setDrawColor(200);
+    doc.line(PX, y, W - PX, y);
+    y += 5;
+
+    // TOTAL
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(...dark);
+    doc.text("Total", PX + 2, y + 6);
+    doc.text(`Rs. ${total.toLocaleString("en-IN")}`, W - PX - 2, y + 6, {
+      align: "right",
     });
 
-    y += rows.length * rowH + 8;
+    // ───────── FOOTER ─────────
+    const footerY = 270;
 
-    // ── TOTAL BOX ─────────────────────────────────────────────────────
-    doc.setFillColor(...primary);
-    doc.roundedRect(PX, y, W - PX * 2, 16, 2, 2, "F");
-
-    doc.setTextColor(...white);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9.5);
-    doc.text("Total Amount Paid", PX + 5, y + 10);
-    doc.setFontSize(12);
-    doc.text(`Rs. ${booking.totalPrice?.toLocaleString("en-IN")}`, W - PX - 5, y + 10, { align: "right" });
-
-    // ── FOOTER ────────────────────────────────────────────────────────
-    const footerY = 274;
-    doc.setFillColor(...lightBg);
-    doc.rect(0, footerY, W, 23, "F");
     doc.setDrawColor(...primary);
-    doc.setLineWidth(0.5);
-    doc.line(0, footerY, W, footerY);
+    doc.line(PX, footerY, W - PX, footerY);
 
-    doc.setTextColor(...primary);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.text("ListingHouse", PX, footerY + 8);
-
-    doc.setTextColor(...gray);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(7.5);
-    doc.text("Thank you for choosing ListingHouse!", PX, footerY + 14);
-    doc.text("support@listinghouse.com", W - PX, footerY + 8, { align: "right" });
-    doc.text("www.listinghouse.com", W - PX, footerY + 14, { align: "right" });
+    doc.setFontSize(8);
+    doc.setTextColor(...gray);
 
-    doc.save(`invoice-${booking._id?.slice(-8)}.pdf`);
+    doc.text("Thank you for your business!", PX, footerY + 6);
+    doc.text("support@listinghouse.com", W - PX, footerY + 6, {
+      align: "right",
+    });
+
+    doc.save(`invoice-${booking._id.slice(-8)}.pdf`);
   };
 
   const handleDeleteBooking = async (bookingId: string) => {
@@ -355,25 +315,23 @@ const YourBookListing = () => {
                         ₹{booking.totalPrice?.toLocaleString()}
                       </span>
                       <span
-                        className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${
-                          booking.isPaid
+                        className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${booking.isPaid
                             ? "bg-green-50 text-green-700 border-green-200"
                             : booking.status === "confirmed"
                               ? "bg-blue-50 text-blue-700 border-blue-200"
                               : booking.status === "pending"
                                 ? "bg-yellow-50 text-yellow-700 border-yellow-200"
                                 : "bg-red-50 text-red-700 border-red-200"
-                        }`}
+                          }`}
                       >
-                        <span className={`w-1.5 h-1.5 rounded-full ${
-                          booking.isPaid
+                        <span className={`w-1.5 h-1.5 rounded-full ${booking.isPaid
                             ? "bg-green-500"
                             : booking.status === "confirmed"
                               ? "bg-blue-500"
                               : booking.status === "pending"
                                 ? "bg-yellow-500"
                                 : "bg-red-500"
-                        }`} />
+                          }`} />
                         {booking.isPaid ? "Paid" : booking.status || "Pending"}
                       </span>
                     </div>
