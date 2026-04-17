@@ -10,6 +10,7 @@ interface ListingProps {
     title: string;
     images: string[];
     price?: number;
+    avgRating?: number;
     location?: string;
     views?: number;
     owner?: { _id: string; username?: string; email?: string };
@@ -21,7 +22,7 @@ const Listing = ({ listing, onDelete }: ListingProps) => {
   const navigate = useNavigate();
   const { currentUser } = useAuthStore();
   const [isLiked, setIsLiked] = useState(false);
-  const [avgRating, setAvgRating] = useState<number | null>(null);
+  const [avgRating, setAvgRating] = useState<number | null>(listing.avgRating ?? null);
 
   useEffect(() => {
     const checkLikeStatus = async () => {
@@ -37,6 +38,11 @@ const Listing = ({ listing, onDelete }: ListingProps) => {
     };
 
     const fetchRating = async () => {
+      if (typeof listing.avgRating === "number") {
+        setAvgRating(listing.avgRating);
+        return;
+      }
+
       try {
         const response = await apiRequest.get(`/review/${listing._id}`);
         const reviews = response.data.data;
@@ -55,7 +61,7 @@ const Listing = ({ listing, onDelete }: ListingProps) => {
       checkLikeStatus();
       fetchRating();
     }
-  }, [listing?._id, currentUser]);
+  }, [listing?._id, listing.avgRating, currentUser]);
 
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();

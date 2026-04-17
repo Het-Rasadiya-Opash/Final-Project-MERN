@@ -86,9 +86,10 @@ export const createListing = async (req: Request, res: Response) => {
 
 export const getAllListings = async (req: Request, res: Response) => {
   try {
-    const { search, category, minPrice, maxPrice } = req.query;
+    const { search, category, minPrice, maxPrice, sortBy, sort } = req.query;
 
     const filter: any = {};
+    const sortValue = String(sortBy || sort || "newest").toLowerCase();
 
     if (search) {
       filter.$or = [
@@ -107,9 +108,67 @@ export const getAllListings = async (req: Request, res: Response) => {
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
 
-    const listings = await listingModel
-      .find(filter)
-      .populate("owner", "username email");
+    let sortStage: Record<string, 1 | -1>;
+
+    switch (sortValue) {
+      case "price":
+        sortStage = { price: 1, createdAt: -1 };
+        break;
+      case "rating":
+        sortStage = { avgRating: -1, createdAt: -1 };
+        break;
+      case "newest":
+      default:
+        sortStage = { createdAt: -1 };
+        break;
+    }
+
+    const listings = await listingModel.aggregate([
+      { $match: filter },
+      {
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "listing",
+          as: "reviewsData",
+        },
+      },
+      {
+        $addFields: {
+          avgRating: {
+            $ifNull: [{ $avg: "$reviewsData.rating" }, 0],
+          },
+        },
+      },
+      { $sort: sortStage },
+      {
+        $lookup: {
+          from: "users",
+          localField: "owner",
+          foreignField: "_id",
+          as: "owner",
+          pipeline: [
+            {
+              $project: {
+                username: 1,
+                email: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          owner: { $arrayElemAt: ["$owner", 0] },
+          avgRating: { $round: ["$avgRating", 1] },
+        },
+      },
+      {
+        $project: {
+          reviewsData: 0,
+        },
+      },
+    ]);
 
     return res.status(200).json({
       success: true,

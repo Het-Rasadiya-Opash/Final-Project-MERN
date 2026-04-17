@@ -114,8 +114,6 @@ const BookingForm = () => {
 
   const basePrice = listing?.price || 0;
   const totalCost = basePrice * nights;
-  const cleaningFee = 0; // hide actual cleaning fee cost
-  const serviceFee = 0; // hide actual service fee cost
   const finalTotal = totalCost; // total is based on nights only
 
   const reviewCount = reviews.length;
