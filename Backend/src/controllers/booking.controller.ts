@@ -180,6 +180,21 @@ export const updatePaymentStatus = async (req: Request, res: Response) => {
   }
 };
 
+export const getListingAvailability = async (req: Request, res: Response) => {
+  try {
+    const { listingId } = req.params;
+    if (!listingId)
+      return res.status(400).json({ message: "Listing ID required" });
+    const bookings = await bookingModel.find(
+      { listing: listingId as string, status: { $ne: "cancelled" } },
+      { checkIn: 1, checkOut: 1, _id: 0 },
+    );
+    res.status(200).json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching availability" });
+  }
+};
+
 export const ListingOwnerShowBookingDetails = async (
   req: Request,
   res: Response,

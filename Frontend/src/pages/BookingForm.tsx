@@ -4,12 +4,15 @@ import apiRequest from "../utils/apiRequest";
 import { ChevronLeft, Star, Loader2, Users, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
 
+interface BookedRange { checkIn: string; checkOut: string; }
+
 const BookingForm = () => {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(1);
   const [listing, setListing] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [bookedRanges, setBookedRanges] = useState<BookedRange[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { listingId } = useParams();
@@ -21,12 +24,14 @@ const BookingForm = () => {
   useEffect(() => {
     const fetchListing = async () => {
       try {
-        const [listingRes, reviewsRes] = await Promise.all([
+        const [listingRes, reviewsRes, availabilityRes] = await Promise.all([
           apiRequest.get(`/listing/${listingId}`),
           apiRequest.get(`/review/${listingId}`),
+          apiRequest.get(`/booking/availability/${listingId}`),
         ]);
         setListing(listingRes.data.data);
         setReviews(reviewsRes.data.data || []);
+        setBookedRanges(availabilityRes.data || []);
       } catch (error: any) {
         setError(
           error.response?.data?.message || "Failed to load listing details.",
@@ -48,6 +53,19 @@ const BookingForm = () => {
     }
   }, [checkIn, checkOut]);
 
+  const isDateBlocked = (dateStr: string) => {
+    if (!dateStr) return false;
+    const date = new Date(dateStr);
+    date.setHours(0, 0, 0, 0);
+    return bookedRanges.some(({ checkIn: ci, checkOut: co }) => {
+      const start = new Date(ci);
+      const end = new Date(co);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(0, 0, 0, 0);
+      return date >= start && date < end;
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!checkIn || !checkOut || guests < 1) {
@@ -56,6 +74,10 @@ const BookingForm = () => {
     }
     if (nights <= 0) {
       setError("Check-out date must be after check-in date.");
+      return;
+    }
+    if (isDateBlocked(checkIn) || isDateBlocked(checkOut)) {
+      setError("Selected dates overlap with an existing booking.");
       return;
     }
 

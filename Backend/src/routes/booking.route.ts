@@ -4,6 +4,7 @@ import {
   createBooking,
   deleteBooking,
   getAllBookings,
+  getListingAvailability,
   getUserBookings,
   listingOwnerChangeBookingStatus,
   ListingOwnerShowBookingDetails,
@@ -11,6 +12,7 @@ import {
 } from "../controllers/booking.controller.js";
 const router = express.Router();
 
+router.get("/availability/:listingId", getListingAvailability);
 router.post("/:listingId", verifyToken, createBooking);
 router.get("/", verifyToken, getAllBookings);
 router.get("/all", verifyToken, ListingOwnerShowBookingDetails);

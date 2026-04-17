@@ -5,6 +5,7 @@ import useAuthStore from "../utils/authStore";
 import Map from "../components/Map";
 import ReviewContainer from "../components/ReviewContainer";
 import ConfirmModal from "../components/ConfirmModal";
+import AvailabilityCalendar from "../components/AvailabilityCalendar";
 import { Heart, MapPin, DoorOpen, Star } from "lucide-react";
 
 interface ReviewData {
@@ -251,6 +252,8 @@ const ListingPage = () => {
                 "Enjoy a wonderful stay at this beautiful property. Highly recommended for short and long terms stays."}
             </p>
           </div>
+
+          <AvailabilityCalendar listingId={id!} />
 
           {(isOwner) && (
             <div className="py-8 border-b border-gray-200">
