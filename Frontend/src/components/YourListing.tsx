@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import apiRequest from "../utils/apiRequest";
 import Listing from "./Listing";
 import ConfirmModal from "./ConfirmModal";
+import RevenueChart from "./RevenueChart";
 
 const YourListing = () => {
   const [listings, setListings] = useState<any>([]);
@@ -104,17 +105,20 @@ const YourListing = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {listings.map((listing: any) => (
-            <Listing
-              key={listing._id}
-              listing={listing}
-              onDelete={(id) =>
-                setConfirmDelete({ isOpen: true, listingId: id })
-              }
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {listings.map((listing: any) => (
+              <Listing
+                key={listing._id}
+                listing={listing}
+                onDelete={(id) =>
+                  setConfirmDelete({ isOpen: true, listingId: id })
+                }
+              />
+            ))}
+          </div>
+          <RevenueChart />
+        </>
       )}
 
       <ConfirmModal

@@ -180,6 +180,41 @@ export const updatePaymentStatus = async (req: Request, res: Response) => {
   }
 };
 
+export const getOwnerRevenue = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user._id;
+    const year = new Date().getFullYear();
+
+    const ownerListings = await listingModel.find({ owner: userId }, "_id");
+    const listingIds = ownerListings.map((l) => l._id);
+
+    const revenue = await bookingModel.aggregate([
+      {
+        $match: {
+          listing: { $in: listingIds },
+          isPaid: true,
+          checkIn: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$checkIn" },
+          total: { $sum: "$totalPrice" },
+          bookings: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    res.status(200).json({ year, revenue });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching revenue" });
+  }
+};
+
 export const getListingAvailability = async (req: Request, res: Response) => {
   try {
     const { listingId } = req.params;
