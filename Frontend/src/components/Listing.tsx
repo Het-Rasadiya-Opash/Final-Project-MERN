@@ -114,7 +114,7 @@ const Listing = ({ listing, onDelete }: ListingProps) => {
           <h3 className="font-semibold text-[15px] text-gray-900 line-clamp-1">
             {listing.location || "Location unlisted"}
           </h3>
-          {avgRating && (
+          {avgRating! > 0 && (
             <div className="flex items-center gap-1 shrink-0 ml-2">
               <Star size={14} className="fill-gray-900 text-gray-900" />
               <span className="text-[15px] text-gray-900 font-light">

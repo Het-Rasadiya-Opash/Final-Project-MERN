@@ -6,6 +6,31 @@ import toast from "react-hot-toast";
 
 interface BookedRange { checkIn: string; checkOut: string; }
 
+const parseLocalDate = (dateStr: string) => {
+  const [year, month, day] = dateStr.slice(0, 10).split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
+
+const formatDateInput = (date: Date) => {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const addDays = (dateStr: string, days: number) => {
+  const date = parseLocalDate(dateStr);
+  date.setDate(date.getDate() + days);
+  return formatDateInput(date);
+};
+
+const formatDisplayDate = (dateStr: string) =>
+  parseLocalDate(dateStr).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
 const BookingForm = () => {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
@@ -20,6 +45,10 @@ const BookingForm = () => {
 
   // Derived state for cost calculation
   const [nights, setNights] = useState(0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayDate = formatDateInput(today);
+  const minCheckOutDate = checkIn ? addDays(checkIn, 1) : addDays(todayDate, 1);
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -43,8 +72,8 @@ const BookingForm = () => {
 
   useEffect(() => {
     if (checkIn && checkOut) {
-      const start = new Date(checkIn);
-      const end = new Date(checkOut);
+      const start = parseLocalDate(checkIn);
+      const end = parseLocalDate(checkOut);
       const timeDiff = end.getTime() - start.getTime();
       const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
       setNights(daysDiff > 0 ? daysDiff : 0);
@@ -53,30 +82,130 @@ const BookingForm = () => {
     }
   }, [checkIn, checkOut]);
 
+  useEffect(() => {
+    if (checkOut && checkIn && checkOut < minCheckOutDate) {
+      setCheckOut("");
+    }
+  }, [checkIn, checkOut, minCheckOutDate]);
+
   const isDateBlocked = (dateStr: string) => {
     if (!dateStr) return false;
-    const date = new Date(dateStr);
-    date.setHours(0, 0, 0, 0);
-    return bookedRanges.some(({ checkIn: ci, checkOut: co }) => {
-      const start = new Date(ci);
-      const end = new Date(co);
-      start.setHours(0, 0, 0, 0);
-      end.setHours(0, 0, 0, 0);
-      return date >= start && date < end;
+
+    const date = parseLocalDate(dateStr);
+    return bookedRanges.some(({ checkIn: bookedCheckIn, checkOut: bookedCheckOut }) => {
+      const bookedStart = parseLocalDate(bookedCheckIn);
+      const bookedEnd = parseLocalDate(bookedCheckOut);
+      return date >= bookedStart && date < bookedEnd;
     });
+  };
+
+  const hasBookingConflict = (startDateStr: string, endDateStr: string) => {
+    if (!startDateStr || !endDateStr) return false;
+
+    const startDate = parseLocalDate(startDateStr);
+    const endDate = parseLocalDate(endDateStr);
+
+    return bookedRanges.some(({ checkIn: bookedCheckIn, checkOut: bookedCheckOut }) => {
+      const bookedStart = parseLocalDate(bookedCheckIn);
+      const bookedEnd = parseLocalDate(bookedCheckOut);
+      return startDate < bookedEnd && endDate > bookedStart;
+    });
+  };
+
+  const nextReservedCheckIn = checkIn
+    ? bookedRanges
+        .map(({ checkIn: bookedCheckIn }) => bookedCheckIn)
+        .filter((bookedCheckIn) => parseLocalDate(bookedCheckIn) > parseLocalDate(checkIn))
+        .sort(
+          (firstDate, secondDate) =>
+            parseLocalDate(firstDate).getTime() - parseLocalDate(secondDate).getTime(),
+        )[0]
+    : undefined;
+
+  const maxCheckOutDate = nextReservedCheckIn
+    ? formatDateInput(parseLocalDate(nextReservedCheckIn))
+    : undefined;
+
+  const upcomingBookedRanges = [...bookedRanges]
+    .filter(({ checkOut: bookedCheckOut }) => parseLocalDate(bookedCheckOut) > today)
+    .sort(
+      (firstRange, secondRange) =>
+        parseLocalDate(firstRange.checkIn).getTime() -
+        parseLocalDate(secondRange.checkIn).getTime(),
+    );
+
+  const handleCheckInChange = (dateStr: string) => {
+    setError(null);
+
+    if (!dateStr) {
+      setCheckIn("");
+      setCheckOut("");
+      return;
+    }
+
+    if (isDateBlocked(dateStr)) {
+      setCheckIn("");
+      setCheckOut("");
+      setError("That check-in date is already reserved. Please choose another date.");
+      return;
+    }
+
+    setCheckIn(dateStr);
+
+    if (checkOut && hasBookingConflict(dateStr, checkOut)) {
+      setCheckOut("");
+      setError("Your previous checkout date overlaps reserved dates. Please choose it again.");
+    }
+  };
+
+  const handleCheckOutChange = (dateStr: string) => {
+    setError(null);
+
+    if (!dateStr) {
+      setCheckOut("");
+      return;
+    }
+
+    if (!checkIn) {
+      setError("Please choose a check-in date first.");
+      return;
+    }
+
+    if (dateStr <= checkIn) {
+      setCheckOut("");
+      setError("Check-out date must be after check-in date.");
+      return;
+    }
+
+    if (hasBookingConflict(checkIn, dateStr)) {
+      setCheckOut("");
+      setError("That checkout date crosses reserved dates. Please choose an available date.");
+      return;
+    }
+
+    setCheckOut(dateStr);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
     if (!checkIn || !checkOut || guests < 1) {
       setError("Please fill in all fields correctly.");
       return;
     }
+
+    if (checkIn < todayDate) {
+      setError("Check-in date cannot be in the past.");
+      return;
+    }
+
     if (nights <= 0) {
       setError("Check-out date must be after check-in date.");
       return;
     }
-    if (isDateBlocked(checkIn) || isDateBlocked(checkOut)) {
+
+    if (hasBookingConflict(checkIn, checkOut)) {
       setError("Selected dates overlap with an existing booking.");
       return;
     }
@@ -178,7 +307,8 @@ const BookingForm = () => {
                         type="date"
                         id="checkIn"
                         value={checkIn}
-                        onChange={(e) => setCheckIn(e.target.value)}
+                        min={todayDate}
+                        onChange={(e) => handleCheckInChange(e.target.value)}
                         className="w-full bg-transparent text-gray-900 outline-none text-sm md:text-base font-medium cursor-pointer"
                         required
                       />
@@ -194,13 +324,33 @@ const BookingForm = () => {
                         type="date"
                         id="checkOut"
                         value={checkOut}
-                        min={checkIn || undefined}
-                        onChange={(e) => setCheckOut(e.target.value)}
+                        min={minCheckOutDate}
+                        max={maxCheckOutDate}
+                        onChange={(e) => handleCheckOutChange(e.target.value)}
                         className="w-full bg-transparent text-gray-900 outline-none text-sm md:text-base font-medium cursor-pointer"
                         required
                       />
                     </div>
                   </div>
+
+                  {upcomingBookedRanges.length > 0 && (
+                    <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                      <p className="text-sm font-semibold text-amber-900">
+                        Reserved stays
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-amber-800">
+                        {upcomingBookedRanges
+                          .slice(0, 3)
+                          .map(
+                            ({ checkIn: bookedCheckIn, checkOut: bookedCheckOut }) =>
+                              `${formatDisplayDate(bookedCheckIn)} to ${formatDisplayDate(bookedCheckOut)} checkout`,
+                          )
+                          .join(" | ")}
+                        {upcomingBookedRanges.length > 3 &&
+                          ` | +${upcomingBookedRanges.length - 3} more`}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Guests */}
@@ -221,7 +371,10 @@ const BookingForm = () => {
                     <select
                       id="guests"
                       value={guests}
-                      onChange={(e) => setGuests(Number(e.target.value))}
+                      onChange={(e) => {
+                        setGuests(Number(e.target.value));
+                        setError(null);
+                      }}
                       className="w-full bg-transparent text-gray-900 outline-none text-sm md:text-base font-medium cursor-pointer appearance-none"
                     >
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (

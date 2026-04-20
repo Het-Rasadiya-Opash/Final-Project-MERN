@@ -7,6 +7,11 @@ interface BookedRange {
   checkOut: string;
 }
 
+const parseLocalDate = (dateStr: string) => {
+  const [year, month, day] = dateStr.slice(0, 10).split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
+
 const AvailabilityCalendar = ({ listingId }: { listingId: string }) => {
   const [bookedRanges, setBookedRanges] = useState<BookedRange[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -20,8 +25,8 @@ const AvailabilityCalendar = ({ listingId }: { listingId: string }) => {
 
   const isBlocked = (date: Date) => {
     return bookedRanges.some(({ checkIn, checkOut }) => {
-      const start = new Date(checkIn);
-      const end = new Date(checkOut);
+      const start = parseLocalDate(checkIn);
+      const end = parseLocalDate(checkOut);
       start.setHours(0, 0, 0, 0);
       end.setHours(0, 0, 0, 0);
       return date >= start && date < end;
